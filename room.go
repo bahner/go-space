@@ -5,7 +5,35 @@ import (
 
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/etf"
+	"github.com/ergo-services/ergo/gen"
 )
+
+func createRoomSupervisor() gen.SupervisorBehavior {
+	return &RoomSupervisor{}
+}
+
+type RoomSupervisor struct {
+	gen.Supervisor
+}
+
+func (sup *MySup) Init(args ...etf.Term) (gen.SupervisorSpec, error) {
+	spec := gen.SupervisorSpec{
+		Name: "mysup",
+		Children: []gen.SupervisorChildSpec{
+			{
+				Name:  "myactor",
+				Child: createMyActor(),
+			},
+		},
+		Strategy: gen.SupervisorStrategy{
+			Type:      gen.SupervisorStrategyOneForOne,
+			Intensity: 2, // How big bursts of restarts you want to tolerate.
+			Period:    5, // In seconds.
+			Restart:   gen.SupervisorStrategyRestartTransient,
+		},
+	}
+	return spec, nil
+}
 
 func (gr *Room) Init(p *ergo.Process, args ...interface{}) (state interface{}) {
 	fmt.Printf("Initializing Go Room Process with room ID: %s\n", args[0])
