@@ -71,6 +71,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Info("Starting myspace dispatcher")
+	n.Spawn("myspace", gen.ProcessOptions{}, createMyspace(), "myspace")
+
 	log.Debug("Starting myspace erlang node for The Closet™.")
 	spawnAndRegisterRoom(defaultRoomID)
 

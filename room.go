@@ -53,5 +53,10 @@ func (gr *Room) HandleCast(server_procces *gen.ServerProcess, message etf.Term) 
 func (gr *Room) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
 	debugstring := fmt.Sprintf("Received message: %s from: %v\n", message, from)
 	fmt.Print(debugstring)
-	return "ok", gen.ServerStatusOK
+	return "ok, got it!", gen.ServerStatusOK
+}
+
+func (gr *Room) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
+	fmt.Printf("Received message: %s\n", message)
+	return gen.ServerStatusOK
 }
