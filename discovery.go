@@ -33,7 +33,7 @@ func DiscoverPeers(ctx context.Context, h host.Host, rendezvousString string) er
 	// Look for others who have announced and attempt to connect to them
 	anyConnected := false
 	for !anyConnected {
-		logger.Info("Searching for peers...")
+		libp2pLog.Info("Searching for peers...")
 		peerChan, err := routingDiscovery.FindPeers(ctx, rendezvousString)
 		if err != nil {
 			return fmt.Errorf("peer discovery error: %w", err)
@@ -46,7 +46,7 @@ func DiscoverPeers(ctx context.Context, h host.Host, rendezvousString string) er
 
 			err := h.Connect(ctx, peer)
 			if err != nil {
-				logger.Errorf("Failed connecting to %s, error: %v\n", peer.ID.Pretty(), err)
+				libp2pLog.Errorf("Failed connecting to %s, error: %v\n", peer.ID.Pretty(), err)
 			} else {
 				fmt.Println("Connected to:", peer.ID.Pretty())
 				anyConnected = true
@@ -54,7 +54,7 @@ func DiscoverPeers(ctx context.Context, h host.Host, rendezvousString string) er
 		}
 	}
 
-	logger.Info("Peer discovery complete")
+	libp2pLog.Info("Peer discovery complete")
 
 	return nil
 }

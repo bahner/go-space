@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
@@ -20,12 +21,13 @@ var (
 	defaultLogLevel   = env.Get("MYSPACE_LIBP2P_LOG_LEVEL", "error")
 	defaultNodeCookie = env.Get("MYSPACE_NODE_COOKIE", "myspace")
 	defaultNodeName   = env.Get("MYSPACE_NODE_NAME", "go@localhost")
+	defaultRoomID     = env.Get("MYSPACE_ROOM_ID", "closet")
 )
 
 var (
 	// h          host.Host
 	ps         *pubsub.PubSub
-	logger     = logging.Logger("myspace")
+	libp2pLog  = logging.Logger("myspace")
 	logLevel   = flag.String("loglevel", defaultLogLevel, "Log level for libp2p")
 	rendezvous = flag.String("rendezvous", defaultRendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")
 	nodeCookie = flag.String("nodecookie", defaultNodeCookie, "Secret shared by all erlang nodes in the cluster")
@@ -40,7 +42,7 @@ func main() {
 
 	// libp2p node
 	logging.SetLogLevel("myspace", *logLevel)
-	logger.Info("Starting myspace libp2p pubsub server...")
+	libp2pLog.Info("Starting myspace libp2p pubsub server...")
 
 	// Start libp2p h
 	h, err := libp2p.New(
@@ -51,9 +53,11 @@ func main() {
 	}
 
 	// Start peer discovery to find other peers
+	log.Debug("Starting peer discovery...")
 	go DiscoverPeers(ctx, h, *rendezvous)
 
 	// Start pubsub service
+	log.Debug("Starting pubsub service...")
 	ps, err = pubsub.NewGossipSub(ctx, h)
 	if err != nil {
 		// This is fatal because without pubsub, the app is useless.
@@ -67,7 +71,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	spawnAndRegisterRoom("lobby")
+	log.Debug("Starting myspace erlang node for The Closet™.")
+	spawnAndRegisterRoom(defaultRoomID)
 
 	select {}
 }

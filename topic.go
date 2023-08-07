@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	pub    *pubsub.PubSub
 	topics sync.Map
 )
 
@@ -24,7 +23,7 @@ func getOrCreateTopic(topicID string) (*Topic, error) {
 		}
 	}
 
-	pubSubTopic, err := pub.Join(topicID)
+	pubSubTopic, err := ps.Join(topicID)
 	if err != nil {
 		return nil, err
 	}
