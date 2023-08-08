@@ -16,11 +16,15 @@ type Subscription struct {
 
 func CreateTopicSubscription(ctx context.Context, id string) gen.ServerBehavior {
 
+	log.Debugf("Creating new topic subscription: %s", id)
+
 	topic, err := getOrCreateTopic(id)
 	if err != nil {
 		fmt.Printf("Error creating topic: %s\n", err)
 		return nil
 	}
+
+	log.Debugf("Created topic: %s", topic.TopicID)
 
 	return &Subscription{
 		topic: *topic,
@@ -32,16 +36,7 @@ func (gr *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
 	topic_id := gr.topic.TopicID
 
-	fmt.Printf("Initializing Go Subscription Process with Subscription ID: %s\n", topic_id)
-
-	_, err := ps.Join(topic_id)
-	if err != nil {
-		fmt.Printf("Error joining topic: %s\n", err)
-		return nil
-	}
-	fmt.Printf("Joined topic: %s\n", topic_id)
-
-	fmt.Printf("Starting to listen for messages on topic: %s\n", topic_id)
+	log.Infof("Topic server subscribing to topic: %s\n", topic_id)
 	go subscribeTopic(sp, gr)
 
 	return nil
@@ -73,6 +68,8 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 	}
 	defer sub.Cancel()
 
+	log.Infof("Subscribed to topic: %s\n", s.topic.TopicID)
+
 	for {
 		msg, err := sub.Next(s.ctx)
 		if err != nil {
@@ -80,7 +77,6 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 			continue
 		}
 
-		// Send the received message back to the GenServer
 		to.Send(to.Self(), etf.Term(string(msg.GetData())))
 	}
 }

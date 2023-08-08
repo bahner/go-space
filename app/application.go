@@ -7,7 +7,7 @@ import (
 	"github.com/ergo-services/ergo/gen"
 )
 
-func StartApplication(ctx context.Context) gen.ApplicationBehavior {
+func createApplication(ctx context.Context) gen.ApplicationBehavior {
 	return &Application{
 		ctx: ctx,
 	}
@@ -19,8 +19,6 @@ type Application struct {
 }
 
 func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
-
-	nodeInit(app.ctx)
 
 	return gen.ApplicationSpec{
 		Name:        appName,
