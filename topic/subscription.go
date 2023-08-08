@@ -3,7 +3,6 @@ package topic
 import (
 	"context"
 	"fmt"
-	"myspace-pubsub/app"
 
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
@@ -15,7 +14,7 @@ type Subscription struct {
 	ctx   context.Context
 }
 
-func createTopicSubscription(ctx context.Context, id string) gen.ServerBehavior {
+func CreateTopicSubscription(ctx context.Context, id string) gen.ServerBehavior {
 
 	topic, err := getOrCreateTopic(id)
 	if err != nil {
@@ -84,12 +83,4 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 		// Send the received message back to the GenServer
 		to.Send(to.Self(), etf.Term(string(msg.GetData())))
 	}
-}
-
-func SubscribeTopic(ctx context.Context, n app.Node, topicID string) {
-	process, err := n.Spawn(topicID, gen.ProcessOptions{}, createTopicSubscription(ctx, topicID), topicID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	n.RegisterName(topicID, process.Self())
 }

@@ -3,8 +3,6 @@ package app
 import (
 	"context"
 
-	"myspace-pubsub/config"
-
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/node"
 )
@@ -13,21 +11,22 @@ type Node struct {
 	node.Node
 }
 
-var (
-	log        = config.Log
-	nodeCookie = config.NodeCookie
-	nodeName   = config.NodeName
-)
+func nodeStart(ctx context.Context) node.Node {
 
-func Start(ctx context.Context) (node.Node, error) {
-
-	log.Infof("Starting Erlang node: %s (%s)\n", *nodeName, *nodeCookie)
-	n, err := ergo.StartNodeWithContext(ctx, *nodeName, *nodeCookie, node.Options{})
+	log.Infof("Starting %s Erlang node: %s (%s)\n", appName, *nodeName, *nodeCookie)
+	appNode, err := ergo.StartNodeWithContext(ctx, *nodeName, *nodeCookie, node.Options{})
 	if err != nil {
 		panic(err)
 	}
 
-	log.Info("done.")
+	log.Info("Application node started sucessfully.")
 
-	return n, nil
+	return appNode
+}
+
+func nodeInit(ctx context.Context) error {
+
+	n = nodeStart(ctx)
+
+	return nil
 }

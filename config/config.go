@@ -15,12 +15,14 @@ var (
 )
 
 var (
-	AppName    = "myspace-pubsub"
-	NodeCookie = flag.String("nodecookie", defaultNodeCookie, "Secret shared by all erlang nodes in the cluster")
-	NodeName   = flag.String("nodename", defaultNodeName, "Name of the erlang node")
-	Log        = logrus.New()
-	Rendezvous = flag.String("rendezvous", defaultRendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")
-	LogLevel   = flag.String("loglevel", defaultLogLevel, "Loglevel to use for application")
+	Version     = "0.0.1"
+	AppName     = "myspace-pubsub"
+	Description = "The Myspace Pubsub Application"
+	NodeCookie  = flag.String("nodecookie", defaultNodeCookie, "Secret shared by all erlang nodes in the cluster")
+	NodeName    = flag.String("nodename", defaultNodeName, "Name of the erlang node")
+	Log         = logrus.New()
+	Rendezvous  = flag.String("rendezvous", defaultRendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")
+	LogLevel    = flag.String("loglevel", defaultLogLevel, "Loglevel to use for application")
 )
 
 func InitLogging() {
