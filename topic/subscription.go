@@ -12,6 +12,7 @@ type Subscription struct {
 	gen.Server
 	topic Topic
 	ctx   context.Context
+	owner gen.ProcessID
 }
 
 func CreateTopicSubscription(ctx context.Context, id string) gen.ServerBehavior {
@@ -26,9 +27,13 @@ func CreateTopicSubscription(ctx context.Context, id string) gen.ServerBehavior 
 
 	log.Debugf("Created topic: %s", topic.TopicID)
 
+	owner := createOwnerProcessId(id)
+	log.Debugf("Created owner process id: %s", owner)
+
 	return &Subscription{
 		topic: *topic,
 		ctx:   ctx,
+		owner: owner,
 	}
 }
 
@@ -79,25 +84,25 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 			continue
 		}
 
-		sendMessageToMyspace(to, "myprocess", msg.GetData())
-		// to.Send(to.Self(), etf.Term(string(msg.GetData())))
+		sendMessage(to, s.owner, msg.GetData())
 	}
 }
 
-func sendMessageToMyspace(process *gen.ServerProcess, processRegisteredName string, data []byte) {
-
-	log.Debugf("Preparing message to Elixir: %s", data)
-
-	// dst := etf.Tuple{etf.Atom("myprocess"), etf.Atom("ex@localhost")}
-	dst := gen.ProcessID{
-		Name: processRegisteredName,
-		Node: *myspaceNodeName,
-	}
+func sendMessage(process *gen.ServerProcess, dst gen.ProcessID, data []byte) error {
 
 	log.Debugf("Sending message to: %s", dst)
 
 	err := process.Process.Send(dst, etf.Term(data))
 	if err != nil {
 		log.Error(err)
+	}
+
+	return nil
+}
+
+func createOwnerProcessId(id string) gen.ProcessID {
+	return gen.ProcessID{
+		Name: id,
+		Node: *myspaceNodeName,
 	}
 }

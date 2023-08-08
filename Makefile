@@ -2,17 +2,44 @@
 
 NAME = myspace-pubsub
 
-default: tidy
+GO ?= go
+PREFIX ?= /usr/local
 
-init: go.mod go.sum
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
+default: clean tidy $(NAME)
+
+init: go.mod tidy
 
 go.mod:
-	go mod init $(NAME)
+	$(GO) mod init $(MODULE_NAME)
 
-go.sum:
-	go mod tidy
+tidy: go.mod
+	$(GO) mod tidy
 
-tidy:
-	go mod tidy
+$(NAME): tidy
+	$(GO) build -o $(NAME)
 
-.PHONY: tidy
+clean:
+	rm -f $(NAME)
+
+distclean: clean
+	rm -f $(shell git ls-files --exclude-standard --others)
+
+image:
+	docker build \
+		-t $(IMAGE) \
+		--build-arg "BUILD_IMAGE=$(BUILD_IMAGE)" \
+		.
+
+run: clean $(NAME)
+	./$(NAME)
+
+.PHONY: default init tidy build client serve install clean distclean
+
+install: $(NAME)
+	install -Dm755 $(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
+
