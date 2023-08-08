@@ -1,4 +1,4 @@
-package pubsub
+package p2p
 
 import (
 	"context"
@@ -33,7 +33,7 @@ func DiscoverPeers(ctx context.Context, h host.Host, rendezvousString string) er
 	// Look for others who have announced and attempt to connect to them
 	anyConnected := false
 	for !anyConnected {
-		libp2pLog.Info("Searching for peers...")
+		log.Info("Searching for peers...")
 		peerChan, err := routingDiscovery.FindPeers(ctx, rendezvousString)
 		if err != nil {
 			return fmt.Errorf("peer discovery error: %w", err)
@@ -46,7 +46,7 @@ func DiscoverPeers(ctx context.Context, h host.Host, rendezvousString string) er
 
 			err := h.Connect(ctx, peer)
 			if err != nil {
-				libp2pLog.Errorf("Failed connecting to %s, error: %v\n", peer.ID.Pretty(), err)
+				log.Errorf("Failed connecting to %s, error: %v\n", peer.ID.Pretty(), err)
 			} else {
 				fmt.Println("Connected to:", peer.ID.Pretty())
 				anyConnected = true
@@ -54,7 +54,7 @@ func DiscoverPeers(ctx context.Context, h host.Host, rendezvousString string) er
 		}
 	}
 
-	libp2pLog.Info("Peer discovery complete")
+	log.Info("Peer discovery complete")
 
 	return nil
 }

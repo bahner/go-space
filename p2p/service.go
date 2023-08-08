@@ -1,13 +1,13 @@
-package pubsub
+package p2p
 
 import (
 	"context"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/libp2p/go-libp2p"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
+
+var PubSubService *pubsub.PubSub
 
 func StartPubSubService(ctx context.Context) {
 

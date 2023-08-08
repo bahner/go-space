@@ -1,4 +1,4 @@
-package pubsub
+package p2p
 
 import (
 	"context"
