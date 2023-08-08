@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/ergo-services/ergo v1.999.224
-	github.com/gorilla/websocket v1.5.0
 	github.com/ipfs/go-log v1.0.5
 	github.com/libp2p/go-libp2p v0.29.1
 	github.com/libp2p/go-libp2p-kad-dht v0.24.3
@@ -35,6 +34,7 @@ require (
 	github.com/google/gopacket v1.1.19 // indirect
 	github.com/google/pprof v0.0.0-20230705174524-200ffdc848b8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect

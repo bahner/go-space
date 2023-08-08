@@ -80,11 +80,3 @@ func main() {
 
 	select {}
 }
-
-func spawnAndRegisterRoom(roomID string) {
-	process, err := n.Spawn(roomID, gen.ProcessOptions{}, createRoom(roomID), roomID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	n.RegisterName(roomID, process.Self())
-}
