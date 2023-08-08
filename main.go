@@ -14,6 +14,7 @@ import (
 	logging "github.com/ipfs/go-log"
 	"github.com/libp2p/go-libp2p"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	"github.com/libp2p/go-libp2p/core/host"
 )
 
 var (
@@ -25,7 +26,7 @@ var (
 )
 
 var (
-	// h          host.Host
+	h          host.Host
 	ps         *pubsub.PubSub
 	libp2pLog  = logging.Logger("myspace")
 	logLevel   = flag.String("loglevel", defaultLogLevel, "Log level for libp2p")
