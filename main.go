@@ -21,7 +21,6 @@ var (
 	defaultLogLevel   = env.Get("MYSPACE_LIBP2P_LOG_LEVEL", "error")
 	defaultNodeCookie = env.Get("MYSPACE_NODE_COOKIE", "myspace")
 	defaultNodeName   = env.Get("MYSPACE_NODE_NAME", "go@localhost")
-	defaultRoomID     = env.Get("MYSPACE_ROOM_ID", "closet")
 )
 
 var (
@@ -72,9 +71,6 @@ func main() {
 
 	log.Info("Starting myspace dispatcher")
 	n.Spawn("myspace", gen.ProcessOptions{}, createMyspace(), "myspace")
-
-	log.Debug("Starting myspace erlang node for The Closet™.")
-	spawnAndRegisterRoom(defaultRoomID)
 
 	select {}
 }
