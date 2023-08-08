@@ -7,11 +7,13 @@ import (
 )
 
 var (
-	log         = config.Log
-	nodeCookie  = config.NodeCookie
-	nodeName    = config.NodeName
-	appName     = config.AppName
-	version     = config.Version
-	description = config.Description
-	n           node.Node
+	log             = config.Log
+	nodeCookie      = config.NodeCookie
+	nodeName        = config.NodeName
+	myspaceNodeName = config.MyspaceNodeName
+	appName         = config.AppName
+	version         = config.Version
+	description     = config.Description
+
+	n node.Node
 )

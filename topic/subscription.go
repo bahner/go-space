@@ -60,15 +60,17 @@ func (gr *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf
 
 func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 
-	log.Infof("Starting to listen for messages on topic: %s\n", s.topic.TopicID)
+	var sid = s.topic.TopicID
+
+	log.Infof("Starting to listen for messages on topic: %s\n", sid)
 
 	sub, err := s.topic.PubSubTopic.Subscribe()
 	if err != nil {
-		log.Fatal(err)
+		log.Errorf("Error subscribing to topic: %s\n", sid)
 	}
 	defer sub.Cancel()
 
-	log.Infof("Subscribed to topic: %s\n", s.topic.TopicID)
+	log.Infof("Subscribed to topic: %s\n", sid)
 
 	for {
 		msg, err := sub.Next(s.ctx)
@@ -77,6 +79,25 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 			continue
 		}
 
-		to.Send(to.Self(), etf.Term(string(msg.GetData())))
+		sendMessageToMyspace(to, "myprocess", msg.GetData())
+		// to.Send(to.Self(), etf.Term(string(msg.GetData())))
+	}
+}
+
+func sendMessageToMyspace(process *gen.ServerProcess, processRegisteredName string, data []byte) {
+
+	log.Debugf("Preparing message to Elixir: %s", data)
+
+	// dst := etf.Tuple{etf.Atom("myprocess"), etf.Atom("ex@localhost")}
+	dst := gen.ProcessID{
+		Name: processRegisteredName,
+		Node: *myspaceNodeName,
+	}
+
+	log.Debugf("Sending message to: %s", dst)
+
+	err := process.Process.Send(dst, etf.Term(data))
+	if err != nil {
+		log.Error(err)
 	}
 }

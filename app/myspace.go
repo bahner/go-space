@@ -36,7 +36,7 @@ func (gr *Myspace) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 }
 
 func (gr *Myspace) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
-	log.Infof("Creating new topic subscripotion with no reply: %s\n", message)
+	log.Infof("Creating new topic subscription with no reply: %s\n", message)
 	return gen.ServerStatusOK
 }
 
@@ -48,6 +48,8 @@ func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerF
 	if err != nil {
 		return nil, gen.ServerStatusIgnore
 	}
+
+	log.Debugf("Extracted topic from message: %s\n", t)
 
 	subscribeTopic(gr.ctx, t)
 	return msg, gen.ServerStatusOK
@@ -64,7 +66,13 @@ func subscribeTopic(ctx context.Context, topicID string) {
 
 	process, err := n.Spawn(topicID, gen.ProcessOptions{}, topic.CreateTopicSubscription(ctx, topicID), topicID)
 	if err != nil {
-		log.Fatal(err)
+		switch err.Error() {
+		case "resource is taken":
+			log.Infof("Already subscribed to topic %s.", topicID)
+		default:
+			log.Errorf("Error subscribing to topic: %s", err)
+		}
+		return
 	}
 	n.RegisterName(topicID, process.Self())
 }
@@ -76,7 +84,11 @@ func extractTopic(term etf.Term) (string, error) {
 		return string(v), nil
 	case string:
 		return v, nil
+	case etf.Atom:
+		return string(v), nil
 	default:
-		return "", fmt.Errorf("unexpected message type: %T", v)
+		msg := fmt.Errorf("unexpected message type: %T", v)
+		log.Error(msg)
+		return "", error(msg)
 	}
 }

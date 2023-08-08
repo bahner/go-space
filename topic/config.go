@@ -6,6 +6,7 @@ import (
 )
 
 var (
-	log    = config.Log
-	topics sync.Map
+	log             = config.Log
+	topics          sync.Map
+	myspaceNodeName = config.MyspaceNodeName
 )
