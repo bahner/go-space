@@ -1,6 +1,6 @@
 #!/usr/bin/make -ef
 
-NAME = myspace
+NAME = myspace-pubsub
 
 default: tidy
 

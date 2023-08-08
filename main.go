@@ -2,24 +2,28 @@ package main
 
 import (
 	"context"
-	"myspace/node"
-	"myspace/pubsub"
+	"myspace-pubsub/app"
+	"myspace-pubsub/config"
+	"myspace-pubsub/p2p"
 )
 
 var (
 	ctx context.Context
-	n   node.Node
+	n   app.Node
 )
 
 func main() {
 
 	ctx = context.Background()
 
-	go pubsub.StartPubSubService(ctx)
+	config.InitLogging()
 
-	n, _ := node.Start(ctx)
+	go p2p.StartPubSubService(ctx)
 
-	go startMyspace(n)
+	// n, _ := app.Start(ctx)
+	go app.Start(ctx)
+
+	// go startMyspace(n)
 
 	select {}
 }

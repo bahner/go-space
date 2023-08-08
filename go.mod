@@ -1,4 +1,4 @@
-module myspace
+module myspace-pubsub
 
 go 1.20
 

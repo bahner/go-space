@@ -11,6 +11,8 @@ var PubSubService *pubsub.PubSub
 
 func StartPubSubService(ctx context.Context) {
 
+	initLogging()
+
 	// Start libp2p node
 	h, err := libp2p.New(
 		libp2p.ListenAddrStrings(),

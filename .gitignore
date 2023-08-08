@@ -19,5 +19,6 @@
 
 # Go workspace file
 go.work
-go-myspace-libp2p
-myspace
+
+# Binaries created by go build ., ie the module name.
+myspace-pubsub
