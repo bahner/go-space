@@ -1,13 +1,7 @@
-package main
+package topic
 
 import (
-	"sync"
-
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
-)
-
-var (
-	topics sync.Map
 )
 
 type Topic struct {

@@ -1,6 +1,6 @@
 #!/usr/bin/make -ef
 
-NAME = go-myspace-libp2p
+NAME = myspace-pubsub
 
 default: tidy
 
