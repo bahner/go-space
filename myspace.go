@@ -5,6 +5,7 @@ import (
 
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+	"github.com/ergo-services/ergo/node"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,6 +19,22 @@ func createMyspace() gen.ServerBehavior {
 
 }
 
+func startMyspace(node node.Node) {
+
+	// Spawn a process with given name, options and gen.ServerBehavior
+	// Process is a gen.ServerProcess interface
+	// Process is a gen.Server interface
+	process, err := node.Spawn("myspace", gen.ProcessOptions{}, createMyspace())
+	if err != nil {
+		panic(err)
+	}
+
+	// Register the process with given name
+	// The process can be accessed from other processes by this name
+	// The process can be accessed from other nodes by this name
+	node.RegisterName("myspace", process.Self())
+
+}
 func (gr *Myspace) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
 	log.Info("Initializing Myspace Dispatcher Process")

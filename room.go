@@ -5,7 +5,11 @@ import (
 
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+
+	pubsub "myspace/pubsub"
 )
+
+var ps = pubsub.PubSubService
 
 type Room struct {
 	gen.Server
