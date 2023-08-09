@@ -26,8 +26,15 @@ $(NAME): tidy
 clean:
 	rm -f $(NAME)
 
+console:
+	docker-compose up -d
+	docker attach go-myspace-pubsub_myspace_1
+
 distclean: clean
 	rm -f $(shell git ls-files --exclude-standard --others)
+
+down:
+	docker-compose down
 
 image:
 	docker build \
@@ -37,6 +44,9 @@ image:
 
 run: clean $(NAME)
 	./$(NAME)
+
+up:
+	docker-compose up -d --remove-orphans
 
 vault:
 	docker-compose up -d vault

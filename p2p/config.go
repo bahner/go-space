@@ -14,5 +14,5 @@ var (
 )
 
 func initLogging() {
-	logging.SetLogLevel(name, "error")
+	logging.SetLogLevel(name, *loglevel)
 }
