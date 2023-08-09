@@ -11,7 +11,7 @@ import (
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 
-	"myspace-pubsub/topic"
+	"github.com/bahner/go-myspace/topic"
 )
 
 type Myspace struct {

@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"log"
-	"myspace-pubsub/app"
-	"myspace-pubsub/config"
-	"myspace-pubsub/p2p"
+
+	"github.com/bahner/go-myspace/p2p"
+
+	"github.com/bahner/go-myspace/config"
+
+	"github.com/bahner/go-myspace/app"
 )
 
 func main() {

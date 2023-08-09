@@ -1,6 +1,7 @@
 #!/usr/bin/make -ef
 
-NAME = myspace-pubsub
+NAME = go-myspace
+MODULE_NAME = github.com/bahner/go-myspace
 
 GO ?= go
 PREFIX ?= /usr/local

@@ -79,7 +79,7 @@ func discoverDHTPeers(ctx context.Context, h host.Host, rendezvousString string)
 			if err != nil {
 				log.Debugf("Failed connecting to %s, error: %v\n", peer.ID.Pretty(), err)
 			} else {
-				log.Infof("Connected to: %s", peer.ID.Pretty())
+				log.Infof("Connected to DHT peer: %s", peer.ID.Pretty())
 				anyConnected = true
 			}
 		}

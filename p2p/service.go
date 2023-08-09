@@ -2,15 +2,22 @@ package p2p
 
 import (
 	"context"
+	"sync"
 
 	"github.com/libp2p/go-libp2p"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
 
-var PubSubService *pubsub.PubSub
+var (
+	wg            sync.WaitGroup
+	PubSubService *pubsub.PubSub
+)
 
 func StartPubSubService(ctx context.Context) {
 
+	defer wg.Done()
+
+	wg.Add(1)
 	go initLogging()
 
 	log.Info("Starting libp2p node...")
@@ -24,8 +31,10 @@ func StartPubSubService(ctx context.Context) {
 
 	// Start peer discovery to find other peers
 	log.Debug("Starting peer discovery...")
+	wg.Add(1)
 	go discoverDHTPeers(ctx, h, *rendezvous)
 	go discoverMDNSPeers(ctx, h, *rendezvous)
+	wg.Wait()
 
 	// Start pubsub service
 	log.Debug("Starting pubsub service...")

@@ -1,7 +1,7 @@
 package topic
 
 import (
-	"myspace-pubsub/p2p"
+	"github.com/bahner/go-myspace/p2p"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )

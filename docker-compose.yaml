@@ -3,9 +3,9 @@
 # Look in `.env` for configuration.
 
 services:
-  myspace-pubsub:
+  go-myspace:
     image: ${IMAGE}
-    hostname: myspace-pubsub
+    hostname: go-myspace
     env_file: .env
 #    ports:
 #      - "127.0.0.1:${MYSPACE_NODE_PORT}:${MYSPACE_NODE_PORT}"
@@ -20,7 +20,7 @@ services:
     env_file: .env
 #  myspace:
 #    image: ${MYSPACE_ELIXIR_IMAGE}
-#    hostname: myspace-pubsub
+#    hostname: myspace
 #    env_file: .env
 #    stdin_open: true 
 #    tty: true

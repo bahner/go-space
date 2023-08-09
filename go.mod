@@ -1,4 +1,4 @@
-module myspace-pubsub
+module github.com/bahner/go-myspace
 
 go 1.20
 
@@ -8,6 +8,7 @@ require (
 	github.com/libp2p/go-libp2p v0.29.2
 	github.com/libp2p/go-libp2p-kad-dht v0.24.3
 	github.com/libp2p/go-libp2p-pubsub v0.9.3
+	github.com/nuts-foundation/go-did v0.6.3
 	github.com/sirupsen/logrus v1.9.3
 	go.deanishe.net/env v0.5.1
 )

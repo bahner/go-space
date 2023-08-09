@@ -1,8 +1,9 @@
 package topic
 
 import (
-	"myspace-pubsub/config"
 	"sync"
+
+	"github.com/bahner/go-myspace/config"
 )
 
 var (

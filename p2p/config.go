@@ -1,7 +1,7 @@
 package p2p
 
 import (
-	"myspace-pubsub/config"
+	"github.com/bahner/go-myspace/config"
 
 	logging "github.com/ipfs/go-log"
 )

@@ -1,4 +1,4 @@
-# go-myspace-pubsub
+# go-github.com/bahner/go-myspace
 
 An Erlang node written in go that handles libp2p for Myspace.
 

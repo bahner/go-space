@@ -1,7 +1,7 @@
 package app
 
 import (
-	"myspace-pubsub/config"
+	"github.com/bahner/go-myspace/config"
 
 	"github.com/ergo-services/ergo/node"
 )

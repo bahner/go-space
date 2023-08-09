@@ -1,7 +1,7 @@
 package message
 
 import (
-	"myspace-pubsub/config"
+	"github.com/bahner/go-myspace/config"
 )
 
 var (

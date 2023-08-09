@@ -18,8 +18,8 @@ var (
 
 var (
 	Version     = "0.0.1"
-	AppName     = "myspace-pubsub"
-	Description = "The Myspace Pubsub Application"
+	AppName     = "go-myspace"
+	Description = "Myspace node written in go to handle libp2p functionality."
 
 	Log = logrus.New()
 
