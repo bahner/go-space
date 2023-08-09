@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"fmt"
+	"sync"
 
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
@@ -13,7 +13,9 @@ type Node struct {
 	node.Node
 }
 
-func StartApplication(ctx context.Context) node.Node {
+func StartApplication(ctx context.Context, wg *sync.WaitGroup) {
+
+	defer wg.Done()
 
 	log.Infof("Starting %s Erlang Application node: %s (%s)\n", appName, nodeName, nodeCookie)
 
@@ -40,7 +42,6 @@ func StartApplication(ctx context.Context) node.Node {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("  process %q with PID %s is started\n", process.Name(), process.Self())
 
-	return n
+	log.Infof("process %q with PID %s is started\n", process.Name(), process.Self())
 }

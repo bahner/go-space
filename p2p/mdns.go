@@ -2,7 +2,7 @@ package p2p
 
 import (
 	"context"
-	"fmt"
+	"sync"
 
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -32,30 +32,30 @@ func initMDNS(peerhost host.Host, rendezvous string) chan peer.AddrInfo {
 	}
 	return n.PeerChan
 }
+func discoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rendezvous string) chan peer.AddrInfo {
 
-func discoverMDNSPeers(ctx context.Context, h host.Host, rendezvous string) chan peer.AddrInfo {
+	defer wg.Done()
 
 	anyConnected := false
 	for !anyConnected {
-
 		log.Info("Starting MDNS peer discovery.")
 		peerChan := initMDNS(h, rendezvous)
 
-		for { // allows multiple peers to join
+		// Keep the loop running until you've connected to a peer
+		for !anyConnected {
 			peer := <-peerChan // will block until we discover a peer
-			fmt.Println("Found MDNS peer:", peer.ID.Pretty(), ", connecting")
+			log.Infof("Found MDNS peer: %s connecting", peer.ID.Pretty())
 
 			err := h.Connect(ctx, peer)
 			if err != nil {
 				log.Debugf("Failed connecting to %s, error: %v\n", peer.ID.Pretty(), err)
 			} else {
-				log.Infof("Connected to DHT peer: %s", peer.ID.Pretty())
+				log.Infof("Connected to MDNS peer: %s", peer.ID.Pretty())
 				anyConnected = true
 			}
 		}
 	}
 
 	log.Info("MDNS peer discovery successful.")
-
 	return nil
 }

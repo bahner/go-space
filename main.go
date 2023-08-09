@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"sync"
 
 	"github.com/bahner/go-myspace/keeper"
 	"github.com/bahner/go-myspace/p2p"
@@ -17,19 +18,17 @@ func main() {
 
 	// Init config and common services
 	config.Init(ctx)
+
 	log := config.Log
 
-	// Start p2p node and services
-	go p2p.StartPubSubService(ctx)
+	// Start background services
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
 
-	// Start Erlang node and application
-	n := app.StartApplication(ctx)
+	p2p.StartPubSubService(ctx, wg)
+	app.StartApplication(ctx, wg)
 
-	status := n.IsAlive()
-	log.Printf("Node is alive: %v\n", status)
-
-	stats := n.Stats()
-	log.Printf("Node stats: %v\n", stats)
+	wg.Wait()
 
 	_secret := []byte("secret")
 

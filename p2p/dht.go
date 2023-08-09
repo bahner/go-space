@@ -13,63 +13,73 @@ import (
 )
 
 func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
-	// Start a DHT, for use in peer discovery. We can't just make a new DHT
-	// client because we want each peer to maintain its own local copy of the
-	// DHT, so that the bootstrapping node of the DHT can go down without
-	// inhibiting future peer discovery.
+	log.Info("Initializing DHT.")
+
 	kademliaDHT, err := dht.New(ctx, h)
 	if err != nil {
-		panic(err)
+		log.Error("Failed to create Kademlia DHT.")
+		return nil, err
+	} else {
+		log.Debug("Kademlia DHT created.")
 	}
-	if err = kademliaDHT.Bootstrap(ctx); err != nil {
-		panic(err)
-	}
-	var wg sync.WaitGroup
-	for _, peerAddr := range dht.DefaultBootstrapPeers {
-		peerinfo, _ := peer.AddrInfoFromP2pAddr(peerAddr)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			if err := h.Connect(ctx, *peerinfo); err != nil {
-				fmt.Println("Bootstrap warning:", err)
-			}
-		}()
-	}
-	wg.Wait()
 
+	err = kademliaDHT.Bootstrap(ctx)
+	if err != nil {
+		log.Error("Failed to bootstrap Kademlia DHT.")
+		return nil, err
+	} else {
+		log.Debug("Kademlia DHT bootstrap setup.")
+	}
+
+	for _, peerAddr := range dht.DefaultBootstrapPeers {
+		peerinfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
+		if err != nil {
+			log.Warnf("Failed to convert bootstrap peer address: %v", err)
+			continue
+		}
+
+		log.Debugf("Bootstrapping to peer: %s", peerinfo.ID.Pretty())
+
+		go func(pInfo peer.AddrInfo) {
+
+			log.Debugf("Attempting connection to peer: %s", pInfo.ID.Pretty())
+
+			if err := h.Connect(ctx, pInfo); err != nil {
+				log.Warnf("Bootstrap warning: %v", err)
+			}
+		}(*peerinfo)
+	}
+
+	log.Info("Kademlia DHT bootstrapped successfully.")
 	return kademliaDHT, nil
 }
 
-// discoverPeers performs peer discovery using the DHT and connects to discovered peers
-func discoverDHTPeers(ctx context.Context, h host.Host, rendezvousString string) error {
+func discoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rendezvousString string) error {
+
+	defer wg.Done()
+
+	log.Debug("Starting DHT route discovery.")
+
 	dhtInstance, err := initDHT(ctx, h)
 	if err != nil {
 		return err
 	}
 
-	// Set up an mDNS service on the libp2p host
-	// ser, err := mdns.NewMdnsService(ctx, h, time.Second*5, rendezvousString)
-	// ser := mdns.NewMdnsService(ctx, h, time.Second*5, rendezvousString)
-	// ser.RegisterNotifee(&discovery.Notifee{})
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// The service will run in the background printing discovered peers to the console
-	// ser.RegisterNotifee(&discovery.Notifee{})
-
 	routingDiscovery := drouting.NewRoutingDiscovery(dhtInstance)
 	dutil.Advertise(ctx, routingDiscovery, rendezvousString)
 
-	// Look for others who have announced and attempt to connect to them
-	anyConnected := false
-	for !anyConnected {
-		log.Info("Starting DHT peer discovery.")
+	log.Infof("Starting DHT peer discovery for rendezvous string: %s", rendezvousString)
+
+	retryCount := 0
+
+	for {
+
 		peerChan, err := routingDiscovery.FindPeers(ctx, rendezvousString)
 		if err != nil {
 			return fmt.Errorf("peer discovery error: %w", err)
 		}
 
+		anyConnected := false
 		for peer := range peerChan {
 			if peer.ID == h.ID() {
 				continue // Skip self connection
@@ -83,9 +93,14 @@ func discoverDHTPeers(ctx context.Context, h host.Host, rendezvousString string)
 				anyConnected = true
 			}
 		}
+
+		if anyConnected {
+			break
+		}
+		retryCount++
+		log.Debugf("Attempts #%d for peer discovery with rendezvous string: %s failed.", retryCount, rendezvousString)
 	}
 
 	log.Info("Peer discovery complete")
-
 	return nil
 }

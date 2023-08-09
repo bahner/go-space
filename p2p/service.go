@@ -9,16 +9,12 @@ import (
 )
 
 var (
-	wg            sync.WaitGroup
 	PubSubService *pubsub.PubSub
 )
 
-func StartPubSubService(ctx context.Context) {
+func StartPubSubService(ctx context.Context, wg *sync.WaitGroup) {
 
 	defer wg.Done()
-
-	wg.Add(1)
-	go initLogging()
 
 	log.Info("Starting libp2p node...")
 	h, err := libp2p.New(
@@ -31,12 +27,15 @@ func StartPubSubService(ctx context.Context) {
 
 	// Start peer discovery to find other peers
 	log.Debug("Starting peer discovery...")
-	wg.Add(1)
-	go discoverDHTPeers(ctx, h, rendezvous)
-	go discoverMDNSPeers(ctx, h, rendezvous)
-	wg.Wait()
+	var discoveryWg sync.WaitGroup
+	discoveryWg.Add(2)
 
-	// Start pubsub service
+	go discoverDHTPeers(ctx, &discoveryWg, h, rendezvous)
+	go discoverMDNSPeers(ctx, &discoveryWg, h, rendezvous)
+
+	// Wait for both discovery processes to complete
+	discoveryWg.Wait()
+
 	log.Debug("Starting pubsub service...")
 	PubSubService, err = pubsub.NewGossipSub(ctx, h)
 	if err != nil {
