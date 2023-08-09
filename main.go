@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"log"
 
+	"github.com/bahner/go-myspace/keeper"
 	"github.com/bahner/go-myspace/p2p"
 
 	"github.com/bahner/go-myspace/config"
@@ -17,6 +17,7 @@ func main() {
 
 	// Init config and common services
 	config.Init(ctx)
+	log := config.Log
 
 	// Start p2p node and services
 	go p2p.StartPubSubService(ctx)
@@ -29,6 +30,17 @@ func main() {
 
 	stats := n.Stats()
 	log.Printf("Node stats: %v\n", stats)
+
+	_secret := []byte("secret")
+
+	k := keeper.New("myspace")
+	defer k.Close()
+
+	safe_secret, err := keeper.Encrypt(k, _secret)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Warnf("safe_secret: %v", safe_secret)
 
 	select {}
 }
