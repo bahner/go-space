@@ -15,7 +15,7 @@ type Node struct {
 
 func StartApplication(ctx context.Context) node.Node {
 
-	log.Infof("Starting %s Erlang Application node: %s (%s)\n", appName, *nodeName, *nodeCookie)
+	log.Infof("Starting %s Erlang Application node: %s (%s)\n", appName, nodeName, nodeCookie)
 
 	var options node.Options
 	var err error
@@ -28,7 +28,7 @@ func StartApplication(ctx context.Context) node.Node {
 	options.Applications = apps
 
 	// Starting node
-	n, err = ergo.StartNodeWithContext(ctx, *nodeName, *nodeCookie, options)
+	n, err = ergo.StartNodeWithContext(ctx, nodeName, nodeCookie, options)
 	if err != nil {
 		panic(err)
 	}

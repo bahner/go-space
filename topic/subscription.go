@@ -103,6 +103,6 @@ func sendMessage(process *gen.ServerProcess, dst gen.ProcessID, data []byte) err
 func createOwnerProcessId(id string) gen.ProcessID {
 	return gen.ProcessID{
 		Name: id,
-		Node: *myspaceNodeName,
+		Node: myspaceNodeName,
 	}
 }

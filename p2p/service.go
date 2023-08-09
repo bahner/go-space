@@ -32,8 +32,8 @@ func StartPubSubService(ctx context.Context) {
 	// Start peer discovery to find other peers
 	log.Debug("Starting peer discovery...")
 	wg.Add(1)
-	go discoverDHTPeers(ctx, h, *rendezvous)
-	go discoverMDNSPeers(ctx, h, *rendezvous)
+	go discoverDHTPeers(ctx, h, rendezvous)
+	go discoverMDNSPeers(ctx, h, rendezvous)
 	wg.Wait()
 
 	// Start pubsub service

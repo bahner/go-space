@@ -8,32 +8,34 @@ import (
 )
 
 var (
-	defaultNodeCookie      = env.Get("MYSPACE_NODE_COOKIE", "myspace")
-	defaultNodeName        = env.Get("MYSPACE_NODE_NAME", "pubsub@localhost")
-	defaultRendezvous      = env.Get("MYSPACE_LIBP2P_RENDEZVOUS", "myspace")
-	defaultLogLevel        = env.Get("MYSPACE_LOG_LEVEL", "error")
-	defaultMyspaceNodeName = env.Get("MYSPACE_MYSPACE_NODE_NAME", "myspace@localhost")
-	defaultVaultAddr       = env.Get("MYSPACE_VAULT_ADDR", "http://localhost:8200")
-)
-
-var (
 	Version     = "0.0.1"
 	AppName     = "go-myspace"
 	Description = "Myspace node written in go to handle libp2p functionality."
 
 	Log = logrus.New()
 
-	LogLevel        = flag.String("loglevel", defaultLogLevel, "Loglevel to use for application")
-	MyspaceNodeName = flag.String("myspace_nodename", defaultMyspaceNodeName, "Name of the node running the actual Myspace")
-	NodeCookie      = flag.String("nodecookie", defaultNodeCookie, "Secret shared by all erlang nodes in the cluster")
-	NodeName        = flag.String("nodename", defaultNodeName, "Name of the erlang node")
-	Rendezvous      = flag.String("rendezvous", defaultRendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")
-	VaultAddr       = flag.String("vaultaddr", defaultVaultAddr, "Address of the vault server")
-	VaultToken      = flag.String("vaulttoken", "", "Token to use to authenticate with the vault server. This is required.")
+	LogLevel        string = env.Get("GO_MYSPACE_LOG_LEVEL", "error")
+	MyspaceNodeName string = env.Get("GO_MYSPACE_MYSPACE_NODE_NAME", "myspace@localhost")
+	NodeCookie      string = env.Get("GO_MYSPACE_NODE_COOKIE", "myspace")
+	NodeName        string = env.Get("GO_MYSPACE_NODE_NAME", "pubsub@localhost")
+	Rendezvous      string = env.Get("GO_MYSPACE_RENDEZVOUS", "myspace")
+	VaultAddr       string = env.Get("GO_MYSPACE_VAULT_ADDR", "http://localhost:8200")
+	VaultToken      string = env.Get("GO_MYSPACE_VAULT_TOKEN", "myspace")
 )
 
 func InitLogging() {
-	level, err := logrus.ParseLevel(*LogLevel)
+
+	flag.StringVar(&LogLevel, "loglevel", LogLevel, "Loglevel to use for application")
+	flag.StringVar(&MyspaceNodeName, "myspace_nodename", MyspaceNodeName, "Name of the node running the actual Myspace")
+	flag.StringVar(&NodeCookie, "nodecookie", NodeCookie, "Secret shared by all erlang nodes in the cluster")
+	flag.StringVar(&NodeName, "nodename", NodeName, "Name of the erlang node")
+	flag.StringVar(&Rendezvous, "rendezvous", Rendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")
+	flag.StringVar(&VaultAddr, "vaultaddr", VaultAddr, "Address of the vault server")
+	flag.StringVar(&VaultToken, "vaulttoken", VaultToken, "Token to use to authenticate with the vault server. This is required.")
+
+	flag.Parse()
+
+	level, err := logrus.ParseLevel(LogLevel)
 	if err != nil {
 		Log.Fatal(err)
 	}
