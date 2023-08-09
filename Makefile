@@ -38,6 +38,9 @@ image:
 run: clean $(NAME)
 	./$(NAME)
 
+vault:
+	docker-compose up -d vault
+
 .PHONY: default init tidy build client serve install clean distclean
 
 install: $(NAME)
