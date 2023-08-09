@@ -15,10 +15,13 @@ func main() {
 
 	ctx := context.Background()
 
-	config.InitLogging()
+	// Init config and common services
+	config.Init(ctx)
 
+	// Start p2p node and services
 	go p2p.StartPubSubService(ctx)
 
+	// Start Erlang node and application
 	n := app.StartApplication(ctx)
 
 	status := n.IsAlive()
