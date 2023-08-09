@@ -35,13 +35,11 @@ func StartApplication(ctx context.Context, wg *sync.WaitGroup) {
 		panic(err)
 	}
 
-	log.Info("Application node started sucessfully.")
-
 	// Starting applications
 	process, err = n.Spawn("myspace", gen.ProcessOptions{}, createMyspace(ctx))
 	if err != nil {
 		panic(err)
 	}
 
-	log.Infof("process %q with PID %s is started\n", process.Name(), process.Self())
+	log.Infof("Started process %q with PID %s.", process.Name(), process.Self())
 }

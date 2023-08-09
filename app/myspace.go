@@ -56,7 +56,7 @@ func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerF
 }
 
 func (gr *Myspace) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
-	fmt.Printf("Received message: %s\n", message)
+	log.Debugf("Received message: %s\n", message)
 	return gen.ServerStatusOK
 }
 

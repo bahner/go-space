@@ -48,13 +48,12 @@ func (gr *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 }
 
 func (gr *Subscription) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
-	fmt.Printf("Received message: %s\n", message)
+	log.Debugf("Received message: %s\n", message)
 	return gen.ServerStatusOK
 }
 
 func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
-	debugstring := fmt.Sprintf("Received message: %s from: %v\n", message, from)
-	fmt.Print(debugstring)
+	log.Debugf("Received message: %s from: %v\n", message, from)
 	return "ok, got it!", gen.ServerStatusOK
 }
 
@@ -73,7 +72,7 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 	if err != nil {
 		log.Errorf("Error subscribing to topic: %s\n", sid)
 	}
-	defer sub.Cancel()
+	// defer sub.Cancel()
 
 	log.Infof("Subscribed to topic: %s\n", sid)
 

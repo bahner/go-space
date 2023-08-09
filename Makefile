@@ -43,6 +43,9 @@ image:
 		--build-arg "BUILD_IMAGE=$(BUILD_IMAGE)" \
 		.
 
+install:
+	install -Dm755 $(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
+
 run: clean $(NAME)
 	./$(NAME)
 
@@ -53,7 +56,3 @@ vault:
 	docker-compose up -d vault
 
 .PHONY: default init tidy build client serve install clean distclean
-
-install: $(NAME)
-	install -Dm755 $(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
-

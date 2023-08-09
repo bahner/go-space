@@ -42,5 +42,5 @@ func StartPubSubService(ctx context.Context, wg *sync.WaitGroup) {
 		// This is fatal because without pubsub, the app is useless.
 		log.Fatal(err)
 	}
-	log.Info("PubSub service started.")
+	log.Info("libp2p PubSub service started.")
 }
