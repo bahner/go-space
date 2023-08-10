@@ -85,10 +85,13 @@ func extractTopic(term etf.Term) (string, error) {
 	log.Debugf("Extracting topic from term: %s", term)
 	switch v := term.(type) {
 	case []uint8:
+		log.Debugf("Converting []uint8 to string: %s", string(v))
 		return string(v), nil
 	case string:
+		log.Debugf("Converting string to string: %s", v)
 		return v, nil
 	case etf.Atom:
+		log.Debugf("Converting atom to string: %s", string(v))
 		return string(v), nil
 	default:
 		msg := fmt.Errorf("unexpected message type: %T", v)

@@ -18,12 +18,12 @@ var (
 
 	// Services for other packages to use
 	Keeper      *secrets.Keeper
-	Log         = logrus.New()
+	Log         *logrus.Logger
 	VaultClient *api.Client
 
 	// Package internal config
-	vaultAddr  string = env.Get("GO_MYSPACE_VAULT_ADDR", "http://localhost:8200")
-	vaultToken string = env.Get("GO_MYSPACE_VAULT_TOKEN", "myspace")
+	VaultAddr  string = env.Get("GO_MYSPACE_VAULT_ADDR", "http://localhost:8200")
+	VaultToken string = env.Get("GO_MYSPACE_VAULT_TOKEN", "myspace")
 
 	// Global config
 	LogLevel        string = env.Get("GO_MYSPACE_LOG_LEVEL", "error")
@@ -41,18 +41,18 @@ func Init(ctx context.Context) {
 	flag.StringVar(&NodeCookie, "nodecookie", NodeCookie, "Secret shared by all erlang nodes in the cluster")
 	flag.StringVar(&NodeName, "nodename", NodeName, "Name of the erlang node")
 	flag.StringVar(&Rendezvous, "rendezvous", Rendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")
-	flag.StringVar(&vaultAddr, "vaultaddr", vaultAddr, "Address of the vault server")
-	flag.StringVar(&vaultToken, "vaulttoken", vaultToken, "Token to use to authenticate with the vault server. This is required.")
+	flag.StringVar(&VaultAddr, "vaultaddr", VaultAddr, "Address of the vault server")
+	flag.StringVar(&VaultToken, "vaulttoken", VaultToken, "Token to use to authenticate with the vault server. This is required.")
 
 	flag.Parse()
 
 	// Init logger
+	Log = logrus.New()
 	level, err := logrus.ParseLevel(LogLevel)
 	if err != nil {
 		Log.Fatal(err)
 	}
 	Log.SetLevel(level)
+	Log.Info("Logger initialized")
 
-	// Init vault
-	VaultClient, _ = initVaultClient(ctx, vaultAddr, vaultToken)
 }

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-myspace/global"
 	"gocloud.dev/secrets"
 	"gocloud.dev/secrets/hashivault"
 )
@@ -19,7 +19,7 @@ import (
 // func New(client *api.Client, key string) *secrets.Keeper {
 func New(key string) *secrets.Keeper {
 
-	client := config.VaultClient
+	client := global.VaultClient
 
 	k := hashivault.OpenKeeper(client, key, nil)
 	log.Infof("Created secrets keeper for key %s", key)

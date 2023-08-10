@@ -2,7 +2,6 @@ package app
 
 import (
 	"github.com/bahner/go-myspace/config"
-
 	"github.com/ergo-services/ergo/node"
 )
 

@@ -1,4 +1,4 @@
-package p2p
+package pubsub
 
 import (
 	"github.com/bahner/go-myspace/config"
