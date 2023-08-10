@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	ps     = global.GetPubSubService()
 	topics sync.Map
 )
 
@@ -21,6 +20,7 @@ type Topic struct {
 func New(topicID string) (*Topic, error) {
 
 	log := config.GetLogger()
+	ps := global.GetPubSubService()
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
 	topic, ok := topics.Load(topicID)

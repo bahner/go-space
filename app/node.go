@@ -13,9 +13,14 @@ type Node struct {
 	node.Node
 }
 
+var n node.Node
+
 func StartApplication(ctx context.Context) {
 
 	log := config.GetLogger()
+	nodeName := config.NodeName
+	nodeCookie := config.NodeCookie
+	appName := config.AppName
 
 	log.Infof("Starting %s Erlang Application node: %s (%s)\n", appName, nodeName, nodeCookie)
 
@@ -42,4 +47,8 @@ func StartApplication(ctx context.Context) {
 	}
 
 	log.Infof("Started process %q with PID %s.", process.Name(), process.Self())
+}
+
+func getNode() node.Node {
+	return n
 }

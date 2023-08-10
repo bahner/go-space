@@ -21,6 +21,10 @@ type Application struct {
 
 func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 
+	appName := config.AppName
+	description := config.Description
+	version := config.Version
+
 	return gen.ApplicationSpec{
 		Name:        appName,
 		Description: description,
@@ -36,5 +40,7 @@ func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 
 func (app *Application) Start(process gen.Process, args ...etf.Term) {
 	log := config.GetLogger()
+	appName := config.AppName
+
 	log.Infof("Application %s started with Pid %s\n", appName, process.Self())
 }
