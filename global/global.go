@@ -8,6 +8,7 @@ import (
 	"github.com/bahner/go-myspace/p2p/host"
 	"github.com/bahner/go-myspace/p2p/pubsub"
 	"github.com/hashicorp/vault/api"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -17,7 +18,6 @@ var (
 
 func InitAndStartServices(ctx context.Context) {
 
-	log := config.GetLogger()
 	host := host.New()
 	vaultAddr := config.VaultAddr
 	vaultToken := config.VaultToken

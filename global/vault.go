@@ -4,15 +4,14 @@ import (
 	"context"
 	"sync"
 
-	"github.com/bahner/go-myspace/config"
 	"github.com/hashicorp/vault/api"
+	log "github.com/sirupsen/logrus"
 	"gocloud.dev/secrets/hashivault"
 )
 
 func initVaultClient(ctx context.Context, wg *sync.WaitGroup, addr string, token string) error {
 	defer wg.Done()
 
-	log := config.GetLogger()
 	client, err := hashivault.Dial(ctx, &hashivault.Config{
 		Token: token,
 		APIConfig: api.Config{

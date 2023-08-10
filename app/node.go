@@ -7,6 +7,8 @@ import (
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
 	"github.com/ergo-services/ergo/node"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Node struct {
@@ -17,7 +19,6 @@ var n node.Node
 
 func StartApplication(ctx context.Context) {
 
-	log := config.GetLogger()
 	nodeName := config.NodeName
 	nodeCookie := config.NodeCookie
 	appName := config.AppName

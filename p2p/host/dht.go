@@ -5,17 +5,15 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bahner/go-myspace/config"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 	drouting "github.com/libp2p/go-libp2p/p2p/discovery/routing"
 	dutil "github.com/libp2p/go-libp2p/p2p/discovery/util"
+	log "github.com/sirupsen/logrus"
 )
 
 func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
-
-	log := config.GetLogger()
 
 	log.Info("Initializing DHT.")
 
@@ -59,8 +57,6 @@ func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
 }
 
 func discoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rendezvousString string) error {
-
-	log := config.GetLogger()
 
 	defer wg.Done()
 

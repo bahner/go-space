@@ -8,6 +8,7 @@ import (
 	"github.com/bahner/go-myspace/keeper"
 
 	"github.com/bahner/go-myspace/config"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -16,7 +17,6 @@ func main() {
 
 	// Init config and logger
 	config.Init(ctx)
-	log := config.GetLogger()
 
 	// Start background services
 	global.InitAndStartServices(ctx)

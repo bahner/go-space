@@ -12,6 +12,8 @@ import (
 	"github.com/bahner/go-myspace/subscription"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Myspace struct {
@@ -28,7 +30,6 @@ func createMyspace(ctx context.Context) gen.ServerBehavior {
 }
 
 func (gr *Myspace) Init(sp *gen.ServerProcess, args ...etf.Term) error {
-	log := config.GetLogger()
 	appName := config.AppName
 
 	log.Infof("Initializing %s GenServer", appName)
@@ -39,14 +40,12 @@ func (gr *Myspace) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
 func (gr *Myspace) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
 
-	log := config.GetLogger()
 	log.Infof("Creating new topic subscription with no reply: %s\n", message)
 	return gen.ServerStatusOK
 }
 
 func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
 
-	log := config.GetLogger()
 	log.Debugf("Creating new topic with a reply: %s\n", message)
 
 	t, err := extractTopic(message)
@@ -66,14 +65,12 @@ func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerF
 }
 
 func (gr *Myspace) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
-	log := config.GetLogger()
 	log.Debugf("Received message: %s\n", message)
 	return gen.ServerStatusOK
 }
 
 func subscribeTopic(ctx context.Context, topicID string) {
 
-	log := config.GetLogger()
 	n = getNode()
 	log.Debugf("Node name: %s is alive. %t", n.Name(), n.IsAlive())
 
@@ -96,7 +93,6 @@ func subscribeTopic(ctx context.Context, topicID string) {
 }
 
 func extractTopic(term etf.Term) (string, error) {
-	log := config.GetLogger()
 
 	log.Debugf("Extracting topic from term: %s", term)
 	switch v := term.(type) {

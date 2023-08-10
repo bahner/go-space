@@ -6,6 +6,7 @@ import (
 	"github.com/bahner/go-myspace/config"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+	log "github.com/sirupsen/logrus"
 )
 
 func createApplication(ctx context.Context) gen.ApplicationBehavior {
@@ -39,7 +40,6 @@ func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 }
 
 func (app *Application) Start(process gen.Process, args ...etf.Term) {
-	log := config.GetLogger()
 	appName := config.AppName
 
 	log.Infof("Application %s started with Pid %s\n", appName, process.Self())

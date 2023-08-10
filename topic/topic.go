@@ -3,9 +3,9 @@ package topic
 import (
 	"sync"
 
-	"github.com/bahner/go-myspace/config"
 	"github.com/bahner/go-myspace/global"
 	p2p_pubsub "github.com/libp2p/go-libp2p-pubsub"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -19,7 +19,6 @@ type Topic struct {
 
 func New(topicID string) (*Topic, error) {
 
-	log := config.GetLogger()
 	ps := global.GetPubSubService()
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
