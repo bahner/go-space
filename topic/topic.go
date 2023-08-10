@@ -1,19 +1,15 @@
 package topic
 
 import (
-	ps "github.com/bahner/go-myspace/p2p/pubsub"
-
-	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	p2p_pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
 
 type Topic struct {
-	PubSubTopic *pubsub.Topic
+	PubSubTopic *p2p_pubsub.Topic
 	TopicID     string
 }
 
-func getOrCreateTopic(topicID string) (*Topic, error) {
-
-	service := ps.Service
+func New(topicID string) (*Topic, error) {
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
 	topic, ok := topics.Load(topicID)
@@ -25,7 +21,7 @@ func getOrCreateTopic(topicID string) (*Topic, error) {
 	}
 
 	log.Debugf("Topic: %s not found in topics map, creating new topic", topicID)
-	pubSubTopic, err := service.Join(topicID)
+	pubSubTopic, err := ps.Sub.Join(topicID)
 	if err != nil {
 		log.Errorf("Error joining topic: %s", err)
 		return nil, err
