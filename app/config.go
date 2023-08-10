@@ -6,7 +6,6 @@ import (
 )
 
 var (
-	log         = config.GetLogger()
 	nodeCookie  = config.NodeCookie
 	nodeName    = config.NodeName
 	appName     = config.AppName

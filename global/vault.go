@@ -2,15 +2,12 @@ package global
 
 import (
 	"context"
-	"sync"
 
 	"github.com/hashicorp/vault/api"
 	"gocloud.dev/secrets/hashivault"
 )
 
-func initVaultClient(ctx context.Context, wg *sync.WaitGroup, addr string, token string) (*api.Client, error) {
-
-	defer wg.Done()
+func initVaultClient(ctx context.Context, addr string, token string) (*api.Client, error) {
 
 	client, err := hashivault.Dial(ctx, &hashivault.Config{
 		Token: token,

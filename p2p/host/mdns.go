@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/bahner/go-myspace/config"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 
@@ -35,6 +36,8 @@ func initMDNS(peerhost host.Host, rendezvous string) chan peer.AddrInfo {
 func discoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rendezvous string) chan peer.AddrInfo {
 
 	defer wg.Done()
+
+	log := config.GetLogger()
 
 	anyConnected := false
 	for !anyConnected {

@@ -5,10 +5,15 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-myspace/global"
 	"github.com/bahner/go-myspace/topic"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+	"github.com/google/martian/log"
 )
+
+var ps = global.GetPubSubService()
 
 type Subscription struct {
 	gen.Server
@@ -18,6 +23,8 @@ type Subscription struct {
 }
 
 func New(ctx context.Context, id string) gen.ServerBehavior {
+
+	log := config.GetLogger()
 
 	log.Debugf("Creating new topic subscription: %s", id)
 
@@ -50,11 +57,14 @@ func (gr *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 }
 
 func (gr *Subscription) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
+	log := config.GetLogger()
 	log.Debugf("Received message: %s\n", message)
 	return gen.ServerStatusOK
 }
 
 func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
+
+	log := config.GetLogger()
 
 	log.Debugf("Received message: %s from: %v\n", message, from)
 
@@ -85,11 +95,13 @@ func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Se
 }
 
 func (gr *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
+	log := config.GetLogger()
 	log.Debugf("Received message: %s\n", message)
 	return gen.ServerStatusOK
 }
 
 func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
+	log := config.GetLogger()
 
 	var sid = s.topic.TopicID
 	var ctx = s.ctx
@@ -116,7 +128,7 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 }
 
 func sendMessage(process *gen.ServerProcess, dst gen.ProcessID, data []byte) error {
-
+	log := config.GetLogger()
 	log.Debugf("Sending message to: %s", dst)
 
 	err := process.Process.Send(dst, etf.Term(data))
@@ -130,7 +142,7 @@ func sendMessage(process *gen.ServerProcess, dst gen.ProcessID, data []byte) err
 func createOwnerProcessId(id string) gen.ProcessID {
 	return gen.ProcessID{
 		Name: id,
-		Node: myspaceNodeName,
+		Node: config.MyspaceNodeName,
 	}
 }
 

@@ -4,10 +4,8 @@ import (
 	"context"
 	"flag"
 
-	"github.com/hashicorp/vault/api"
 	"github.com/sirupsen/logrus"
 	"go.deanishe.net/env"
-	"gocloud.dev/secrets"
 )
 
 var (
@@ -16,10 +14,7 @@ var (
 	AppName     = "go-myspace"
 	Description = "Myspace node written in go to handle libp2p functionality."
 
-	// Services for other packages to use
-	Keeper      *secrets.Keeper
-	Log         *logrus.Logger
-	VaultClient *api.Client
+	log *logrus.Logger
 
 	// Package internal config
 	VaultAddr  string = env.Get("GO_MYSPACE_VAULT_ADDR", "http://localhost:8200")
@@ -47,16 +42,16 @@ func Init(ctx context.Context) {
 	flag.Parse()
 
 	// Init logger
-	Log = logrus.New()
+	log = logrus.New()
 	level, err := logrus.ParseLevel(LogLevel)
 	if err != nil {
-		Log.Fatal(err)
+		log.Fatal(err)
 	}
-	Log.SetLevel(level)
-	Log.Info("Logger initialized")
+	log.SetLevel(level)
+	log.Info("Logger initialized")
 
 }
 
 func GetLogger() *logrus.Logger {
-	return Log
+	return log
 }

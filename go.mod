@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/ergo-services/ergo v1.999.224
+	github.com/google/martian v2.1.0+incompatible
 	github.com/hashicorp/vault/api v1.9.2
 	github.com/libp2p/go-libp2p v0.29.2
 	github.com/libp2p/go-libp2p-kad-dht v0.24.3

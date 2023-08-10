@@ -1,7 +1,16 @@
 package topic
 
 import (
+	"sync"
+
+	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-myspace/global"
 	p2p_pubsub "github.com/libp2p/go-libp2p-pubsub"
+)
+
+var (
+	ps     = global.GetPubSubService()
+	topics sync.Map
 )
 
 type Topic struct {
@@ -10,6 +19,8 @@ type Topic struct {
 }
 
 func New(topicID string) (*Topic, error) {
+
+	log := config.GetLogger()
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
 	topic, ok := topics.Load(topicID)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/bahner/go-myspace/config"
 	libp2p "github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 )
@@ -17,6 +18,9 @@ func New() *P2pHost {
 }
 
 func (h *P2pHost) Init(ctx context.Context) {
+
+	log := config.GetLogger()
+
 	var err error
 	log.Info("Starting libp2p node...")
 	h.Node, err = libp2p.New(libp2p.ListenAddrStrings())
@@ -26,14 +30,14 @@ func (h *P2pHost) Init(ctx context.Context) {
 	log.Info("libp2p node created: ", h.Node.ID().Pretty())
 }
 
-func (h *P2pHost) StartPeerDiscovery(ctx context.Context) {
+func (h *P2pHost) StartPeerDiscovery(ctx context.Context, wg *sync.WaitGroup) {
+
+	log := config.GetLogger()
+	rendezvous := config.Rendezvous
+
 	log.Debug("Starting peer discovery...")
-	var discoveryWg sync.WaitGroup
-	discoveryWg.Add(2)
 
-	go discoverDHTPeers(ctx, &discoveryWg, h.Node, rendezvous)
-	go discoverMDNSPeers(ctx, &discoveryWg, h.Node, rendezvous)
-
-	// Wait for both discovery processes to complete
-	discoveryWg.Wait()
+	wg.Add(2)
+	go discoverDHTPeers(ctx, wg, h.Node, rendezvous)
+	go discoverMDNSPeers(ctx, wg, h.Node, rendezvous)
 }

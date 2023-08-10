@@ -8,9 +8,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bahner/go-myspace/config"
 	"github.com/bahner/go-myspace/subscription"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+	"github.com/google/martian/log"
 )
 
 type Myspace struct {
@@ -27,6 +29,7 @@ func createMyspace(ctx context.Context) gen.ServerBehavior {
 }
 
 func (gr *Myspace) Init(sp *gen.ServerProcess, args ...etf.Term) error {
+	log := config.GetLogger()
 
 	log.Infof("Initializing %s GenServer", appName)
 
@@ -83,6 +86,8 @@ func subscribeTopic(ctx context.Context, topicID string) {
 }
 
 func extractTopic(term etf.Term) (string, error) {
+	log := config.GetLogger()
+
 	log.Debugf("Extracting topic from term: %s", term)
 	switch v := term.(type) {
 	case []uint8:

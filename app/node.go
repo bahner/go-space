@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/bahner/go-myspace/config"
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
 	"github.com/ergo-services/ergo/node"
@@ -16,6 +17,8 @@ type Node struct {
 func StartApplication(ctx context.Context, wg *sync.WaitGroup) {
 
 	defer wg.Done()
+
+	log := config.GetLogger()
 
 	log.Infof("Starting %s Erlang Application node: %s (%s)\n", appName, nodeName, nodeCookie)
 

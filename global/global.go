@@ -4,38 +4,56 @@ import (
 	"context"
 	"sync"
 
+	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-myspace/p2p/host"
 	"github.com/bahner/go-myspace/p2p/pubsub"
+	"github.com/hashicorp/vault/api"
 )
 
 var (
-	wg  *sync.WaitGroup
-	err error
+	err           error
+	vaultClient   *api.Client
+	pubSubService *pubsub.Service
 )
-
-func InitGlobalResources(ctx context.Context) {
-
-	VaultClient, err = initVaultClient(ctx, wg, vaultAddr, vaultToken)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	PubSubService = pubsub.New()
-	PubSubService.Init(ctx)
-}
 
 func StartServices(ctx context.Context) {
 
-	wg = &sync.WaitGroup{}
+	log := config.GetLogger()
+	vaultAddr := config.VaultAddr
+	vaultToken := config.VaultToken
 
-	// Init pubsub
+	log.Info("Initializing global resources")
+
+	wg := &sync.WaitGroup{}
+
+	p2phost := host.New()
+	p2phost.Init(ctx)
 	wg.Add(1)
-	PubSubService, err = startPubSubService(ctx, wg)
+	p2phost.StartPeerDiscovery(ctx, wg)
+	log.Info("Waiting for P2P host to start")
+	wg.Wait()
+	log.Info("P2P host started")
+
+	pubSubService = pubsub.New(p2phost)
+	wg.Add(1)
+	pubSubService.Start(ctx, wg)
+	log.Info("Waiting for pubsub service to start")
+	wg.Wait()
+	log.Info("Pubsub service started")
+
+	// Initialize vault client
+	vaultClient, err = initVaultClient(ctx, vaultAddr, vaultToken)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Info("Vault client initialized")
 
-	log.Info("Waiting for global services to start")
-	wg.Wait()
-	log.Info("Global services started")
+}
 
+func GetVaultClient() *api.Client {
+	return vaultClient
+}
+
+func GetPubSubService() *pubsub.Service {
+	return pubSubService
 }
