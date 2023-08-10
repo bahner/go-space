@@ -41,8 +41,7 @@ func (gr *Myspace) HandleCast(server_procces *gen.ServerProcess, message etf.Ter
 }
 
 func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
-	msg := fmt.Sprintf("Creating new topic with a reply: %s\n", message)
-	log.Info(msg)
+	log.Debugf("Creating new topic with a reply: %s\n", message)
 
 	t, err := extractTopic(message)
 	if err != nil {
@@ -52,6 +51,11 @@ func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerF
 	log.Debugf("Extracted topic from message: %s\n", t)
 
 	subscribeTopic(gr.ctx, t)
+
+	msg := etf.Tuple{
+		etf.Atom("go_myspace_created_topic"),
+		etf.String(t)}
+
 	return msg, gen.ServerStatusOK
 }
 
