@@ -3,31 +3,39 @@ package global
 import (
 	"context"
 	"sync"
+
+	"github.com/bahner/go-myspace/p2p/pubsub"
 )
 
 var (
-	globalWg *sync.WaitGroup
-	err      error
+	wg  *sync.WaitGroup
+	err error
 )
 
-func StartServices(ctx context.Context) {
+func InitGlobalResources(ctx context.Context) {
 
-	// Init vault
-	globalWg.Add(1)
-	VaultClient, err = initVaultClient(ctx, vaultAddr, vaultToken)
+	VaultClient, err = initVaultClient(ctx, wg, vaultAddr, vaultToken)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	PubSubService = pubsub.New()
+	PubSubService.Init(ctx)
+}
+
+func StartServices(ctx context.Context) {
+
+	wg = &sync.WaitGroup{}
+
 	// Init pubsub
-	globalWg.Add(1)
-	PubSubService, err = startPubSubService(ctx)
+	wg.Add(1)
+	PubSubService, err = startPubSubService(ctx, wg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Info("Waiting for global services to start")
-	globalWg.Wait()
+	wg.Wait()
 	log.Info("Global services started")
 
 }

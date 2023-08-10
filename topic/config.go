@@ -10,6 +10,6 @@ import (
 var (
 	topics sync.Map
 
-	log = config.Log
+	log = config.GetLogger()
 	ps  = *global.PubSubService
 )

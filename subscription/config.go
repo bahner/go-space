@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	log             = config.Log
+	log             = config.GetLogger()
 	myspaceNodeName = config.MyspaceNodeName
 	ps              = *global.PubSubService
 )

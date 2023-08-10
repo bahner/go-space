@@ -56,3 +56,7 @@ func Init(ctx context.Context) {
 	Log.Info("Logger initialized")
 
 }
+
+func GetLogger() *logrus.Logger {
+	return Log
+}

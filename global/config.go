@@ -14,5 +14,5 @@ var (
 var (
 	vaultAddr  = config.VaultAddr
 	vaultToken = config.VaultToken
-	log        = config.Log
+	log        = config.GetLogger()
 )

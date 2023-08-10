@@ -13,10 +13,9 @@ func main() {
 
 	ctx := context.Background()
 
-	// Init config and common services
+	// Init config and logger
 	config.Init(ctx)
-
-	log := config.Log
+	log := config.GetLogger()
 
 	// Start background services
 	global.StartServices(ctx)

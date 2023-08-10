@@ -1,4 +1,4 @@
-package pubsub
+package host
 
 import (
 	"github.com/bahner/go-myspace/config"
