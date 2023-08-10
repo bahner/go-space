@@ -2,7 +2,6 @@ package pubsub
 
 import (
 	"context"
-	"sync"
 
 	"github.com/bahner/go-myspace/config"
 	"github.com/bahner/go-myspace/p2p/host"
@@ -20,8 +19,7 @@ func New(host *host.P2pHost) *Service {
 	}
 }
 
-func (p *Service) Start(ctx context.Context, wg *sync.WaitGroup) {
-	defer wg.Done()
+func (p *Service) Start(ctx context.Context) {
 	var err error
 	log := config.GetLogger()
 

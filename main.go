@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"github.com/bahner/go-myspace/app"
 	"github.com/bahner/go-myspace/global"
 	"github.com/bahner/go-myspace/keeper"
 
@@ -18,7 +19,10 @@ func main() {
 	log := config.GetLogger()
 
 	// Start background services
-	global.StartServices(ctx)
+	global.InitAndStartServices(ctx)
+
+	// Start application
+	app.StartApplication(ctx)
 
 	_secret := []byte("secret")
 

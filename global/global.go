@@ -11,49 +11,29 @@ import (
 )
 
 var (
-	err           error
 	vaultClient   *api.Client
 	pubSubService *pubsub.Service
 )
 
-func StartServices(ctx context.Context) {
+func InitAndStartServices(ctx context.Context) {
 
 	log := config.GetLogger()
+	host := host.New()
 	vaultAddr := config.VaultAddr
 	vaultToken := config.VaultToken
 
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
 	log.Info("Initializing global resources")
 
-	wg := &sync.WaitGroup{}
+	initPubSubService(ctx, wg, host)
+	initVaultClient(ctx, wg, vaultAddr, vaultToken)
 
-	p2phost := host.New()
-	p2phost.Init(ctx)
-	wg.Add(1)
-	p2phost.StartPeerDiscovery(ctx, wg)
-	log.Info("Waiting for P2P host to start")
+	log.Info("Waiting for global resources to be initialized ...")
+
 	wg.Wait()
-	log.Info("P2P host started")
 
-	pubSubService = pubsub.New(p2phost)
-	wg.Add(1)
-	pubSubService.Start(ctx, wg)
-	log.Info("Waiting for pubsub service to start")
-	wg.Wait()
-	log.Info("Pubsub service started")
+	log.Info("Global resources initialized")
 
-	// Initialize vault client
-	vaultClient, err = initVaultClient(ctx, vaultAddr, vaultToken)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Info("Vault client initialized")
-
-}
-
-func GetVaultClient() *api.Client {
-	return vaultClient
-}
-
-func GetPubSubService() *pubsub.Service {
-	return pubSubService
 }

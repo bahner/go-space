@@ -6,30 +6,30 @@ import (
 	"gocloud.dev/secrets"
 )
 
-func Encrypt(keeper *secrets.Keeper, data []byte) ([]byte, error) {
+func Encrypt(k *secrets.Keeper, data []byte) ([]byte, error) {
 
 	ctx := context.Background()
 
-	result, err := keeper.Encrypt(ctx, data)
+	result, err := k.Encrypt(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	defer keeper.Close()
+	defer k.Close()
 
 	return result, nil
 }
 
-func Decrypt(keeper *secrets.Keeper, data []byte) ([]byte, error) {
+func Decrypt(k *secrets.Keeper, data []byte) ([]byte, error) {
 
 	ctx := context.Background()
 
-	result, err := keeper.Decrypt(ctx, data)
+	result, err := k.Decrypt(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	defer keeper.Close()
+	defer k.Close()
 
 	return result, nil
 }

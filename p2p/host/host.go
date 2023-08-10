@@ -30,14 +30,16 @@ func (h *P2pHost) Init(ctx context.Context) {
 	log.Info("libp2p node created: ", h.Node.ID().Pretty())
 }
 
-func (h *P2pHost) StartPeerDiscovery(ctx context.Context, wg *sync.WaitGroup) {
+func (h *P2pHost) StartPeerDiscovery(ctx context.Context) {
 
 	log := config.GetLogger()
 	rendezvous := config.Rendezvous
 
 	log.Debug("Starting peer discovery...")
 
+	wg := &sync.WaitGroup{}
 	wg.Add(2)
 	go discoverDHTPeers(ctx, wg, h.Node, rendezvous)
 	go discoverMDNSPeers(ctx, wg, h.Node, rendezvous)
+	wg.Wait()
 }

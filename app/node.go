@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"sync"
 
 	"github.com/bahner/go-myspace/config"
 	"github.com/ergo-services/ergo"
@@ -14,9 +13,7 @@ type Node struct {
 	node.Node
 }
 
-func StartApplication(ctx context.Context, wg *sync.WaitGroup) {
-
-	defer wg.Done()
+func StartApplication(ctx context.Context) {
 
 	log := config.GetLogger()
 
