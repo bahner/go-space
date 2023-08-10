@@ -8,10 +8,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bahner/go-myspace/subscription"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
-
-	"github.com/bahner/go-myspace/topic"
 )
 
 type Myspace struct {
@@ -68,7 +67,9 @@ func subscribeTopic(ctx context.Context, topicID string) {
 
 	log.Debugf("Subscribing to topic: %s", topicID)
 
-	process, err := n.Spawn(topicID, gen.ProcessOptions{}, topic.CreateTopicSubscription(ctx, topicID), topicID)
+	sub := subscription.New(ctx, topicID)
+
+	process, err := n.Spawn(topicID, gen.ProcessOptions{}, sub, topicID)
 	if err != nil {
 		switch err.Error() {
 		case "resource is taken":

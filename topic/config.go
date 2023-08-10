@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	log             = config.Log
-	topics          sync.Map
-	myspaceNodeName = config.MyspaceNodeName
-	ps              = *global.PubSubService
+	topics sync.Map
+
+	log = config.Log
+	ps  = *global.PubSubService
 )

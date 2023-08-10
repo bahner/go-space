@@ -10,8 +10,8 @@ import (
 )
 
 type Service struct {
-	Node   host.Host
-	PubSub *pubsub.PubSub
+	Node host.Host
+	Sub  *pubsub.PubSub
 }
 
 func New() *Service {
@@ -41,7 +41,7 @@ func (p *Service) Start(ctx context.Context, wg *sync.WaitGroup) {
 	discoveryWg.Wait()
 
 	log.Debug("Starting pubsub service...")
-	p.PubSub, err = pubsub.NewGossipSub(ctx, p.Node)
+	p.Sub, err = pubsub.NewGossipSub(ctx, p.Node)
 	if err != nil {
 		log.Fatal(err)
 	}
