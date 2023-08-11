@@ -33,7 +33,7 @@ func initMDNS(peerhost host.Host, serviceName string) chan peer.AddrInfo {
 	}
 	return n.PeerChan
 }
-func discoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, serviceName string) chan peer.AddrInfo {
+func DiscoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, serviceName string) chan peer.AddrInfo {
 
 	defer wg.Done()
 

@@ -56,7 +56,7 @@ func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
 	return kademliaDHT, nil
 }
 
-func discoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rendezvousString string) error {
+func DiscoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rendezvousString string) error {
 
 	defer wg.Done()
 
