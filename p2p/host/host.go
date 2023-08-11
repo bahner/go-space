@@ -35,6 +35,6 @@ func (h *P2pHost) StartPeerDiscovery(ctx context.Context, rendezvous string) {
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 	go discoverDHTPeers(ctx, wg, h.Node, rendezvous)
-	go discoverMDNSPeers(ctx, wg, h.Node, rendezvous)
+	go discoverMDNSPeers(ctx, wg, h.Node, "")
 	wg.Wait()
 }

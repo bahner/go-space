@@ -21,26 +21,26 @@ func (n *discoveryNotifee) HandlePeerFound(pi peer.AddrInfo) {
 }
 
 // Initialize the MDNS service
-func initMDNS(peerhost host.Host, rendezvous string) chan peer.AddrInfo {
+func initMDNS(peerhost host.Host, serviceName string) chan peer.AddrInfo {
 	// register with service so that we get notified about peer discovery
 	n := &discoveryNotifee{}
 	n.PeerChan = make(chan peer.AddrInfo)
 
 	// An hour might be a long long period in practical applications. But this is fine for us
-	ser := mdns.NewMdnsService(peerhost, rendezvous, n)
+	ser := mdns.NewMdnsService(peerhost, serviceName, n)
 	if err := ser.Start(); err != nil {
 		panic(err)
 	}
 	return n.PeerChan
 }
-func discoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rendezvous string) chan peer.AddrInfo {
+func discoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, serviceName string) chan peer.AddrInfo {
 
 	defer wg.Done()
 
 	anyConnected := false
 	for !anyConnected {
 		log.Info("Starting MDNS peer discovery.")
-		peerChan := initMDNS(h, rendezvous)
+		peerChan := initMDNS(h, serviceName)
 
 		// Keep the loop running until you've connected to a peer
 		for !anyConnected {
