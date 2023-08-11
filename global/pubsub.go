@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/bahner/go-myspace/config"
 	"github.com/bahner/go-myspace/p2p/host"
 	"github.com/bahner/go-myspace/p2p/pubsub"
 )
@@ -14,7 +15,7 @@ func initPubSubService(ctx context.Context, wg *sync.WaitGroup, host *host.P2pHo
 
 	// Start libp2p node and discover peers
 	host.Init(ctx)
-	host.StartPeerDiscovery(ctx)
+	host.StartPeerDiscovery(ctx, config.Rendezvous)
 
 	pubSubService = pubsub.New(host)
 	pubSubService.Start(ctx)

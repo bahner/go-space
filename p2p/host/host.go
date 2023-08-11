@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/bahner/go-myspace/config"
 	libp2p "github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 	log "github.com/sirupsen/logrus"
@@ -29,9 +28,7 @@ func (h *P2pHost) Init(ctx context.Context) {
 	log.Info("libp2p node created: ", h.Node.ID().Pretty())
 }
 
-func (h *P2pHost) StartPeerDiscovery(ctx context.Context) {
-
-	rendezvous := config.Rendezvous
+func (h *P2pHost) StartPeerDiscovery(ctx context.Context, rendezvous string) {
 
 	log.Debug("Starting peer discovery...")
 
