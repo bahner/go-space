@@ -1,6 +1,7 @@
 #!/usr/bin/make -ef
 
 NAME = go-myspace
+VERSION=0.0.4
 MODULE_NAME = github.com/bahner/go-myspace
 
 GO ?= go
@@ -48,6 +49,10 @@ install:
 
 run: clean $(NAME)
 	./$(NAME)
+
+release: default
+	git tag -a $(VERSION) -m "Release $(VERSION)"
+	git push origin $(VERSION)
 
 up:
 	docker-compose up -d --remove-orphans

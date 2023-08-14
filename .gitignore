@@ -22,3 +22,4 @@ go.work
 
 # Binaries created by go build ., ie the module name.
 go-myspace
+go-myspace-*
