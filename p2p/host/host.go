@@ -10,18 +10,25 @@ import (
 )
 
 type P2pHost struct {
-	Node host.Host
+	Node    host.Host
+	Options []libp2p.Option
 }
 
-func New() *P2pHost {
-	return &P2pHost{}
+func New(options ...libp2p.Option) *P2pHost {
+	return &P2pHost{
+		Options: options,
+	}
+}
+
+func (h *P2pHost) AddOption(opt libp2p.Option) {
+	h.Options = append(h.Options, opt)
 }
 
 func (h *P2pHost) Init(ctx context.Context) {
 
 	var err error
 	log.Info("Starting libp2p node...")
-	h.Node, err = libp2p.New(libp2p.ListenAddrStrings())
+	h.Node, err = libp2p.New(h.Options...)
 	if err != nil {
 		log.Fatal(err)
 	}
