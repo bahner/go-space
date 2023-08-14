@@ -1,7 +1,7 @@
 #!/usr/bin/make -ef
 
 NAME = go-myspace
-VERSION=0.0.4
+VERSION=0.0.5
 MODULE_NAME = github.com/bahner/go-myspace
 
 GO ?= go

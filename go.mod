@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/ergo-services/ergo v1.999.224
 	github.com/hashicorp/vault/api v1.9.2
-	github.com/libp2p/go-libp2p v0.29.2
+	github.com/libp2p/go-libp2p v0.29.1
 	github.com/libp2p/go-libp2p-kad-dht v0.24.3
 	github.com/libp2p/go-libp2p-pubsub v0.9.3
 	github.com/sirupsen/logrus v1.9.3
