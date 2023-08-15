@@ -28,6 +28,21 @@ func PrintEd25519KeyAndExit() {
 
 }
 
+func GenerateSecretKey() string {
+
+	privKey, _, err := crypto.GenerateEd25519Key(rand.Reader)
+	if err != nil {
+		log.Fatalf("Failed to generate private key: %v", err)
+	}
+	marshalledPrivKey, err := crypto.MarshalPrivateKey(privKey)
+	if err != nil {
+		log.Fatalf("Failed to marshal private key: %v", err)
+	}
+	encodedPrivKey := base58.Encode(marshalledPrivKey)
+
+	return encodedPrivKey
+}
+
 func CreateIdentity(privKey string) crypto.PrivKey {
 
 	// Decode the secret key
@@ -42,4 +57,18 @@ func CreateIdentity(privKey string) crypto.PrivKey {
 
 	return p
 
+}
+
+func ExtractSecretKey(privKey string) crypto.PrivKey {
+
+	decodedPrivKey, err := base58.Decode(privKey)
+	if err != nil {
+		log.Errorf("Failed to decode base58 secret key: %v", err)
+	}
+	unmarshalledPrivKey, err := crypto.UnmarshalPrivateKey(decodedPrivKey)
+	if err != nil {
+		log.Errorf("Failed to unmarshal private key: %v", err)
+	}
+
+	return unmarshalledPrivKey
 }
