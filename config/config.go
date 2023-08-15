@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 
+	key "github.com/bahner/go-myspace/key"
 	"github.com/sirupsen/logrus"
 	"go.deanishe.net/env"
 )
@@ -26,6 +27,7 @@ var (
 	NodeCookie      string = env.Get("GO_MYSPACE_NODE_COOKIE", "myspace")
 	NodeName        string = env.Get("GO_MYSPACE_NODE_NAME", "pubsub@localhost")
 	Rendezvous      string = env.Get("GO_MYSPACE_RENDEZVOUS", "myspace")
+	Secret          string = env.Get("GO_MYSPACE_P2P_IDENTITY", "")
 	ServiceName     string = env.Get("GO_MYSPACE_SERVICE_NAME", "myspace")
 )
 
@@ -37,11 +39,18 @@ func Init(ctx context.Context) {
 	flag.StringVar(&NodeCookie, "nodecookie", NodeCookie, "Secret shared by all erlang nodes in the cluster")
 	flag.StringVar(&NodeName, "nodename", NodeName, "Name of the erlang node")
 	flag.StringVar(&Rendezvous, "rendezvous", Rendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")
+	flag.StringVar(&Secret, "identity", Secret, "Base58 encoded secret key used to identify libp2p node for persistency.")
 	flag.StringVar(&ServiceName, "servicename", ServiceName, "serviceName to use for MDNS discovery")
 	flag.StringVar(&VaultAddr, "vaultaddr", VaultAddr, "Address of the vault server")
 	flag.StringVar(&VaultToken, "vaulttoken", VaultToken, "Token to use to authenticate with the vault server. This is required.")
 
+	generate := flag.Bool("generate", false, "Generate a new identity")
+
 	flag.Parse()
+
+	if *generate {
+		key.PrintEd25519KeyAndExit()
+	}
 
 	// Init logger
 	log = logrus.New()

@@ -8,6 +8,7 @@ require (
 	github.com/libp2p/go-libp2p v0.29.2
 	github.com/libp2p/go-libp2p-kad-dht v0.24.3
 	github.com/libp2p/go-libp2p-pubsub v0.9.3
+	github.com/mr-tron/base58 v1.2.0
 	github.com/sirupsen/logrus v1.9.3
 	go.deanishe.net/env v0.5.1
 	gocloud.dev v0.33.0
@@ -86,7 +87,6 @@ require (
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/mr-tron/base58 v1.2.0 // indirect
 	github.com/multiformats/go-base32 v0.1.0 // indirect
 	github.com/multiformats/go-base36 v0.2.0 // indirect
 	github.com/multiformats/go-multiaddr v0.10.1 // indirect

@@ -5,9 +5,11 @@ import (
 	"sync"
 
 	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-myspace/key"
 	"github.com/bahner/go-myspace/p2p/host"
 	"github.com/bahner/go-myspace/p2p/pubsub"
 	"github.com/hashicorp/vault/api"
+	"github.com/libp2p/go-libp2p"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,7 +20,15 @@ var (
 
 func InitAndStartServices(ctx context.Context) {
 
-	host := host.New()
+	// Configure host
+	s := config.Secret
+	h := host.New()
+	if config.Secret != "" {
+		id := key.CreateIdentity(s)
+		h.AddOption(libp2p.Identity(id))
+	}
+
+	// Configure vault
 	vaultAddr := config.VaultAddr
 	vaultToken := config.VaultToken
 
@@ -27,7 +37,7 @@ func InitAndStartServices(ctx context.Context) {
 
 	log.Info("Initializing global resources")
 
-	initPubSubService(ctx, wg, host)
+	initPubSubService(ctx, wg, h)
 	initVaultClient(ctx, wg, vaultAddr, vaultToken)
 
 	log.Info("Waiting for global resources to be initialized ...")
