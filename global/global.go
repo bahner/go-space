@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"github.com/bahner/go-myspace/config"
-	"github.com/bahner/go-myspace/key"
 	"github.com/bahner/go-myspace/p2p/host"
+	"github.com/bahner/go-myspace/p2p/key"
 	"github.com/bahner/go-myspace/p2p/pubsub"
 	"github.com/hashicorp/vault/api"
 	"github.com/libp2p/go-libp2p"

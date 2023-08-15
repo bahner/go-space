@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 
-	key "github.com/bahner/go-myspace/key"
+	"github.com/bahner/go-myspace/p2p/key"
 	"github.com/sirupsen/logrus"
 	"go.deanishe.net/env"
 )
