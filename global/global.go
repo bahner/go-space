@@ -24,7 +24,10 @@ func InitAndStartServices(ctx context.Context) {
 	s := config.Secret
 	h := host.New()
 	if config.Secret != "" {
-		id := key.CreateIdentity(s)
+		id, err := key.DecodePrivKey(s)
+		if err != nil {
+			log.Fatal(err)
+		}
 		h.AddOption(libp2p.Identity(id))
 	}
 

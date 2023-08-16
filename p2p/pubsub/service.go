@@ -10,10 +10,10 @@ import (
 
 type Service struct {
 	Sub  *pubsub.PubSub
-	Host *host.P2pHost
+	Host *host.Host
 }
 
-func New(host *host.P2pHost) *Service {
+func New(host *host.Host) *Service {
 	return &Service{
 		Host: host,
 	}

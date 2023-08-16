@@ -9,22 +9,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type P2pHost struct {
+type Host struct {
 	Node    host.Host
 	Options []libp2p.Option
 }
 
-func New(options ...libp2p.Option) *P2pHost {
-	return &P2pHost{
+func New(options ...libp2p.Option) *Host {
+	return &Host{
 		Options: options,
 	}
 }
 
-func (h *P2pHost) AddOption(opt libp2p.Option) {
+func (h *Host) AddOption(opt libp2p.Option) {
 	h.Options = append(h.Options, opt)
 }
 
-func (h *P2pHost) Init(ctx context.Context) {
+func (h *Host) Init(ctx context.Context) {
 
 	var err error
 	log.Info("Starting libp2p node...")
@@ -35,7 +35,7 @@ func (h *P2pHost) Init(ctx context.Context) {
 	log.Info("libp2p node created: ", h.Node.ID().Pretty())
 }
 
-func (h *P2pHost) StartPeerDiscovery(ctx context.Context, rendezvous string, serviceName string) {
+func (h *Host) StartPeerDiscovery(ctx context.Context, rendezvous string, serviceName string) {
 
 	log.Debug("Starting peer discovery...")
 
