@@ -62,7 +62,7 @@ func NewFromEncodedPrivKey(encodedPrivKey string) (*Key, error) {
 	}, nil
 }
 
-func PrintEd25519KeyAndExit() {
+func PrintEncodedKeyAndExit() {
 
 	encodedPrivKey, err := GenerateEncodedKey()
 	if err != nil {

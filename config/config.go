@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"github.com/bahner/go-myspace/p2p/key"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"go.deanishe.net/env"
 )
 
@@ -14,8 +14,6 @@ var (
 	Version     = "0.0.1"
 	AppName     = "go-myspace"
 	Description = "Myspace node written in go to handle libp2p functionality."
-
-	log *logrus.Logger
 
 	// Package internal config
 	VaultAddr  string = env.Get("GO_MYSPACE_VAULT_ADDR", "http://localhost:8200")
@@ -49,12 +47,11 @@ func Init(ctx context.Context) {
 	flag.Parse()
 
 	if *generate {
-		key.PrintEd25519KeyAndExit()
+		key.PrintEncodedKeyAndExit()
 	}
 
 	// Init logger
-	log = logrus.New()
-	level, err := logrus.ParseLevel(LogLevel)
+	level, err := log.ParseLevel(LogLevel)
 	if err != nil {
 		log.Fatal(err)
 	}
