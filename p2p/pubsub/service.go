@@ -3,7 +3,7 @@ package pubsub
 import (
 	"context"
 
-	"github.com/bahner/go-myspace/p2p/host"
+	"github.com/bahner/go-space/p2p/host"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	log "github.com/sirupsen/logrus"
 )

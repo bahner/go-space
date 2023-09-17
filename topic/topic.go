@@ -3,7 +3,7 @@ package topic
 import (
 	"sync"
 
-	"github.com/bahner/go-myspace/global"
+	"github.com/bahner/go-space/global"
 	p2p_pubsub "github.com/libp2p/go-libp2p-pubsub"
 	log "github.com/sirupsen/logrus"
 )

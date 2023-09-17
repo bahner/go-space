@@ -1,1 +1,1 @@
-GenServer.call({:myspace, :"pubsub@localhost"}, :closet)
+GenServer.call({:space, :"pubsub@localhost"}, :closet)

@@ -7,7 +7,7 @@ import (
 )
 
 // UnsignedDID generates the unsigned DID
-func (doc *DID) UnsignedDID() ([]byte, error) {
+func (doc *DIDDocument) UnsignedDID() ([]byte, error) {
 	// Remove the signature field before serializing
 	doc.Signature = ""
 	unsignedDID, err := json.Marshal(doc)
@@ -18,7 +18,7 @@ func (doc *DID) UnsignedDID() ([]byte, error) {
 }
 
 // Sign signs the DID
-func (doc *DID) Sign(privKey ed25519.PrivateKey) error {
+func (doc *DIDDocument) Sign(privKey ed25519.PrivateKey) error {
 	unsignedDID, err := doc.UnsignedDID()
 	if err != nil {
 		return err

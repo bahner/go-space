@@ -12,7 +12,7 @@ type VerificationMethod struct {
 }
 
 // updateVerificationMethods updates the VerificationMethods in the DID
-func updateVerificationMethods(doc *DID, vm VerificationMethod) {
+func updateVerificationMethods(doc *DIDDocument, vm VerificationMethod) {
 	doc.VerificationMethod = append(doc.VerificationMethod, vm)
 	doc.Authentication = append(doc.Authentication, vm.ID)
 	doc.AssertionMethod = append(doc.AssertionMethod, vm.ID)

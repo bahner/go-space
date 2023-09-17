@@ -1,8 +1,8 @@
 #!/usr/bin/make -ef
 
-NAME = go-myspace
+NAME = go-space
 VERSION=0.0.8
-MODULE_NAME = github.com/bahner/go-myspace
+MODULE_NAME = github.com/bahner/go-space
 
 GO ?= go
 PREFIX ?= /usr/local
@@ -30,7 +30,7 @@ clean:
 
 console:
 	docker-compose up -d
-	docker attach go-myspace-pubsub_myspace_1
+	docker attach go-space-pubsub_space_1
 
 distclean: clean
 	rm -f $(shell git ls-files --exclude-standard --others)

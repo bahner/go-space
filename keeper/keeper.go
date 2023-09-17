@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bahner/go-myspace/global"
+	"github.com/bahner/go-space/global"
 	log "github.com/sirupsen/logrus"
 	"gocloud.dev/secrets"
 	"gocloud.dev/secrets/hashivault"

@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 
-	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-space/config"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 	log "github.com/sirupsen/logrus"
@@ -33,7 +33,7 @@ func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 		Children: []gen.ApplicationChildSpec{
 			{
 				Name:  appName,
-				Child: createMyspace(app.ctx),
+				Child: createSpace(app.ctx),
 			},
 		},
 	}, nil

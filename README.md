@@ -1,19 +1,19 @@
-# go-github.com/bahner/go-myspace
+# go-github.com/bahner/go-space
 
-An Erlang node written in go that handles libp2p for Myspace.
+An Erlang node written in go that handles libp2p for Space.
 
 This node will handle the plumbing of messaging and pubsub.
 
 Notably it handles the verification and signing of messages,
-so that messages passed to Myspace are believed are trusted.
+so that messages passed to Space are believed are trusted.
 Since this is the only way in and out of messages for the time
 being that should be OK. It's not out-of-scope to move this
-to Myspace itself.
+to Space itself.
 
 Using Vault as a backend for secrets, secrets are easily shared,
-but actually Myspace shouldn't need to do this for now.
+but actually Space shouldn't need to do this for now.
 
-Myspace has an objectID separate from the IPNS CID. This is
+Space has an objectID separate from the IPNS CID. This is
 a future proof way of designing the iplementation.
 This make rekeying of objects possible. Between go and Elixir
 the objectID is used (a NanoID, which is superior to UUID.4).
@@ -21,16 +21,16 @@ the objectID is used (a NanoID, which is superior to UUID.4).
 The NanoID is attached to the DID as the fragment of the did.
 NB! The did part is not in any way, shape or form ready. But
 this needs to be resolved fairly soon. The did:ipid author is
-not responding yet. So a did:myspace is being thought of.
+not responding yet. So a did:space is being thought of.
 This is probably not a bad idea any way, as that means we 
 can add state (IPLD) to the did's.
 
-This way things can be developed separately. Myspace trusts
+This way things can be developed separately. Space trusts
 go and Go needs to be made secure. The gist is that anything
 over `lo` is safe and can be trusted. If that doesn't suit you,
 then get involved.
 
-The upshot should be that Myspace can be developed naiïvely for
+The upshot should be that Space can be developed naiïvely for
 now, without having to sign and verify everything. I believe this
 a huge relief.
 As stated, this can be changed. Store secrets in Vault and Bob's

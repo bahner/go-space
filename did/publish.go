@@ -28,7 +28,7 @@ func PublishOptions() *PublishOption {
 }
 
 // Publish publishes the DID document
-func (d *DID) Publish(privateKey crypto.PrivKey, opts *PublishOption) error {
+func (d *DIDDocument) Publish(privateKey crypto.PrivKey, opts *PublishOption) error {
 	if err := validatePublishOptions(opts); err != nil {
 		return err
 	}

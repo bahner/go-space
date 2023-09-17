@@ -9,8 +9,8 @@ import (
 // Ed25519PubKeyMulticodec is a constant representing the multicodec value for the Ed25519 public key
 const Ed25519PubKeyMulticodec = multicodec.Ed25519Pub
 
-// DID defines the structure of a DID Document
-type DID struct {
+// DIDDocument defines the structure of a DIDDocument Document
+type DIDDocument struct {
 	Context              []string             `json:"@context"`
 	ID                   string               `json:"id"`
 	Signature            string               `json:"signature,omitempty"`
@@ -23,7 +23,7 @@ type DID struct {
 }
 
 // New initializes a new DID
-func New(identifier string, options map[string]interface{}) (*DID, error) {
+func New(identifier string, options map[string]interface{}) (*DIDDocument, error) {
 	// Extract components from the identifier
 	scheme, method, version, multibaseValue := extractComponents(identifier)
 
@@ -53,8 +53,8 @@ func New(identifier string, options map[string]interface{}) (*DID, error) {
 }
 
 // initializeDID initializes a new DID with basic fields
-func initializeDID(identifier string) DID {
-	return DID{
+func initializeDID(identifier string) DIDDocument {
+	return DIDDocument{
 		Context: []string{"https://www.w3.org/ns/did/v1"},
 		ID:      identifier,
 	}

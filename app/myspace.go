@@ -1,35 +1,35 @@
 package app
 
-// This genserver is started by the Myspace
+// This genserver is started by the Space
 // It is used to add children, ie. topics to the
-// Myspace supervision tree
+// Space supervision tree
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/bahner/go-myspace/config"
-	"github.com/bahner/go-myspace/subscription"
+	"github.com/bahner/go-space/config"
+	"github.com/bahner/go-space/subscription"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type Myspace struct {
+type Space struct {
 	gen.Server
 	ctx context.Context
 }
 
-func createMyspace(ctx context.Context) gen.ServerBehavior {
+func createSpace(ctx context.Context) gen.ServerBehavior {
 
-	return &Myspace{
+	return &Space{
 		ctx: ctx,
 	}
 
 }
 
-func (gr *Myspace) Init(sp *gen.ServerProcess, args ...etf.Term) error {
+func (gr *Space) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 	appName := config.AppName
 
 	log.Infof("Initializing %s GenServer", appName)
@@ -38,13 +38,13 @@ func (gr *Myspace) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
 }
 
-func (gr *Myspace) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
+func (gr *Space) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
 
 	log.Infof("Creating new topic subscription with no reply: %s\n", message)
 	return gen.ServerStatusOK
 }
 
-func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
+func (gr *Space) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
 
 	log.Debugf("Creating new topic with a reply: %s\n", message)
 
@@ -58,13 +58,13 @@ func (gr *Myspace) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerF
 	subscribeTopic(gr.ctx, t)
 
 	msg := etf.Tuple{
-		etf.Atom("go_myspace_created_topic"),
+		etf.Atom("go_space_created_topic"),
 		etf.String(t)}
 
 	return msg, gen.ServerStatusOK
 }
 
-func (gr *Myspace) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
+func (gr *Space) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
 	log.Debugf("Received message: %s\n", message)
 	return gen.ServerStatusOK
 }
