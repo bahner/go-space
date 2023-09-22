@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 
-	"github.com/bahner/go-space/p2p/key"
+	"github.com/bahner/go-sub-etha/libp2p/key"
 	log "github.com/sirupsen/logrus"
 	"go.deanishe.net/env"
 )
@@ -47,7 +47,7 @@ func Init(ctx context.Context) {
 	flag.Parse()
 
 	if *generate {
-		key.PrintEncodedKeyAndExit()
+		key.PrintNewAndExit()
 	}
 
 	// Init logger

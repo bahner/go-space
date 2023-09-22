@@ -6,7 +6,7 @@ import (
 
 	"github.com/bahner/go-space/config"
 	"github.com/bahner/go-space/p2p/host"
-	"github.com/bahner/go-space/p2p/key"
+	"github.com/bahner/go-sub-etha/libp2p/key"
 	"github.com/bahner/go-space/p2p/pubsub"
 	"github.com/hashicorp/vault/api"
 	"github.com/libp2p/go-libp2p"
@@ -24,11 +24,11 @@ func InitAndStartServices(ctx context.Context) {
 	s := config.Secret
 	h := host.New()
 	if config.Secret != "" {
-		id, err := key.DecodePrivKey(s)
+		id, err := key.Unpack(s)
 		if err != nil {
 			log.Fatal(err)
 		}
-		h.AddOption(libp2p.Identity(id))
+		h.AddOption(libp2p.Identity(id.PrivKey))
 	}
 
 	// Configure vault
