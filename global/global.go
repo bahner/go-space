@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
+	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-space/config"
 	"github.com/bahner/go-space/p2p/host"
-	"github.com/bahner/go-sub-etha/libp2p/key"
 	"github.com/bahner/go-space/p2p/pubsub"
 	"github.com/hashicorp/vault/api"
 	"github.com/libp2p/go-libp2p"

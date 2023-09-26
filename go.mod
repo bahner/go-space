@@ -1,9 +1,9 @@
 module github.com/bahner/go-space
 
-go 1.20
+go 1.21.1
 
 require (
-	github.com/bahner/go-sub-etha v0.0.0-20230924124838-c9191ae5aa25
+	github.com/bahner/go-ma v0.0.0-20230925211345-f0f54eea63c2
 	github.com/ergo-services/ergo v1.999.224
 	github.com/hashicorp/vault/api v1.9.2
 	github.com/ipfs/boxo v0.13.1

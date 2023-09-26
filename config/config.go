@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 
-	"github.com/bahner/go-sub-etha/libp2p/key"
+	"github.com/bahner/go-ma/key"
 	log "github.com/sirupsen/logrus"
 	"go.deanishe.net/env"
 )
@@ -13,7 +13,7 @@ var (
 	// Erlang application config
 	Version     = "0.0.1"
 	AppName     = "go-space"
-	Description = "Space node written in go to handle libp2p functionality."
+	Description = "Space node written in go to handle 間 functionality."
 
 	// Package internal config
 	VaultAddr  string = env.Get("GO_space_VAULT_ADDR", "http://localhost:8200")
