@@ -10,7 +10,7 @@ require (
 	github.com/ipfs/go-ipfs-api v0.7.0
 	github.com/libp2p/go-libp2p v0.32.0
 	github.com/libp2p/go-libp2p-kad-dht v0.25.1
-	github.com/libp2p/go-libp2p-pubsub v0.9.3
+	github.com/libp2p/go-libp2p-pubsub v0.9.4-0.20230914081111-d13e24ddc9f2
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-multicodec v0.9.0
 	github.com/multiformats/go-multihash v0.2.3
