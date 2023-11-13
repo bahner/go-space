@@ -100,7 +100,6 @@ func DiscoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, rend
 			break
 		}
 		retryCount++
-		log.Debugf("Attempts #%d for peer discovery with rendezvous string: %s failed.", retryCount, rendezvousString)
 	}
 
 	log.Info("Peer discovery complete")
