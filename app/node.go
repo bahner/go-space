@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 
-	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-space/config"
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
 	"github.com/ergo-services/ergo/node"
@@ -42,7 +42,7 @@ func StartApplication(ctx context.Context) {
 	}
 
 	// Starting applications
-	process, err = n.Spawn("myspace", gen.ProcessOptions{}, createMyspace(ctx))
+	process, err = n.Spawn("space", gen.ProcessOptions{}, createSPACE(ctx))
 	if err != nil {
 		panic(err)
 	}

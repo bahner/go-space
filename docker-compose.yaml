@@ -3,13 +3,13 @@
 # Look in `.env` for configuration.
 
 services:
-  go-myspace:
+  go-space:
     image: ${IMAGE}
-    hostname: go-myspace
+    hostname: go-space
     env_file: .env
 #    ports:
-#      - "127.0.0.1:${MYSPACE_NODE_PORT}:${MYSPACE_NODE_PORT}"
-#      - ":::${MYSPACE_NODE_PORT}:${MYSPACE_NODE_PORT}"
+#      - "127.0.0.1:${SPACE_NODE_PORT}:${SPACE_NODE_PORT}"
+#      - ":::${SPACE_NODE_PORT}:${SPACE_NODE_PORT}"
   vault:
     image: ${VAULT_IMAGE}
     cap_add:
@@ -18,15 +18,15 @@ services:
       - "127.0.0.1:${VAULT_PORT}:${VAULT_PORT}"
       - ":::${VAULT_PORT}:${VAULT_PORT}"
     env_file: .env
-#  myspace:
-#    image: ${MYSPACE_ELIXIR_IMAGE}
-#    hostname: myspace
+#  space:
+#    image: ${SPACE_ELIXIR_IMAGE}
+#    hostname: space
 #    env_file: .env
 #    stdin_open: true 
 #    tty: true
 #    command:
 #      - iex
 #      - --sname
-#      - ${MYSPACE_MYSPACE_NODE_NAME}
+#      - ${SPACE_SPACE_NODE_NAME}
 #      - --cookie
-#      - ${MYSPACE_NODE_COOKIE}
+#      - ${SPACE_NODE_COOKIE}

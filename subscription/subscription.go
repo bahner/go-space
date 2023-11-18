@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bahner/go-myspace/config"
-	"github.com/bahner/go-myspace/global"
-	"github.com/bahner/go-myspace/topic"
+	"github.com/bahner/go-space/config"
+	"github.com/bahner/go-space/global"
+	"github.com/bahner/go-space/topic"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 	log "github.com/sirupsen/logrus"
@@ -134,7 +134,7 @@ func sendMessage(process *gen.ServerProcess, dst gen.ProcessID, data []byte) err
 func createOwnerProcessId(id string) gen.ProcessID {
 	return gen.ProcessID{
 		Name: id,
-		Node: config.MyspaceNodeName,
+		Node: config.SPACENodeName,
 	}
 }
 

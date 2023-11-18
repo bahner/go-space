@@ -25,7 +25,7 @@ func (h *P2pHost) Init(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Info("libp2p node created: ", h.Node.ID().Pretty())
+	log.Info("libp2p node created: ", h.Node.ID().String())
 }
 
 func (h *P2pHost) StartPeerDiscovery(ctx context.Context, rendezvous string) {

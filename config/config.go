@@ -11,28 +11,28 @@ import (
 var (
 	// Erlang application config
 	Version     = "0.0.1"
-	AppName     = "go-myspace"
-	Description = "Myspace node written in go to handle libp2p functionality."
+	AppName     = "go-space"
+	Description = "SPACE node written in go to handle libp2p functionality."
 
 	log *logrus.Logger
 
 	// Package internal config
-	VaultAddr  string = env.Get("GO_MYSPACE_VAULT_ADDR", "http://localhost:8200")
-	VaultToken string = env.Get("GO_MYSPACE_VAULT_TOKEN", "myspace")
+	VaultAddr  string = env.Get("GO_SPACE_VAULT_ADDR", "http://localhost:8200")
+	VaultToken string = env.Get("GO_SPACE_VAULT_TOKEN", "space")
 
 	// Global config
-	LogLevel        string = env.Get("GO_MYSPACE_LOG_LEVEL", "error")
-	MyspaceNodeName string = env.Get("GO_MYSPACE_MYSPACE_NODE_NAME", "myspace@localhost")
-	NodeCookie      string = env.Get("GO_MYSPACE_NODE_COOKIE", "myspace")
-	NodeName        string = env.Get("GO_MYSPACE_NODE_NAME", "pubsub@localhost")
-	Rendezvous      string = env.Get("GO_MYSPACE_RENDEZVOUS", "myspace")
+	LogLevel      string = env.Get("GO_SPACE_LOG_LEVEL", "error")
+	SPACENodeName string = env.Get("GO_SPACE_SPACE_NODE_NAME", "space@localhost")
+	NodeCookie    string = env.Get("GO_SPACE_NODE_COOKIE", "space")
+	NodeName      string = env.Get("GO_SPACE_NODE_NAME", "pubsub@localhost")
+	Rendezvous    string = env.Get("GO_SPACE_RENDEZVOUS", "space")
 )
 
 func Init(ctx context.Context) {
 
 	// Flags - user configurations
 	flag.StringVar(&LogLevel, "loglevel", LogLevel, "Loglevel to use for application")
-	flag.StringVar(&MyspaceNodeName, "myspace_nodename", MyspaceNodeName, "Name of the node running the actual Myspace")
+	flag.StringVar(&SPACENodeName, "space_nodename", SPACENodeName, "Name of the node running the actual SPACE")
 	flag.StringVar(&NodeCookie, "nodecookie", NodeCookie, "Secret shared by all erlang nodes in the cluster")
 	flag.StringVar(&NodeName, "nodename", NodeName, "Name of the erlang node")
 	flag.StringVar(&Rendezvous, "rendezvous", Rendezvous, "Unique string to identify group of nodes. Share this with your friends to let them connect with you")

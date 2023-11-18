@@ -14,5 +14,5 @@ COPY --from=Build /main /main
 
 # We always listen on 0.0.0.0 inside the docker container.
 # By setting this explicit we override the
-# MYSPACE_PUBSUB_DAEMON_ADDR which, has lower priority
+# SPACE_PUBSUB_DAEMON_ADDR which, has lower priority
 ENTRYPOINT [ "/main"]

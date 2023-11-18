@@ -45,13 +45,13 @@ func discoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host, ren
 		// Keep the loop running until you've connected to a peer
 		for !anyConnected {
 			peer := <-peerChan // will block until we discover a peer
-			log.Infof("Found MDNS peer: %s connecting", peer.ID.Pretty())
+			log.Infof("Found MDNS peer: %s connecting", peer.ID.String())
 
 			err := h.Connect(ctx, peer)
 			if err != nil {
-				log.Debugf("Failed connecting to %s, error: %v\n", peer.ID.Pretty(), err)
+				log.Debugf("Failed connecting to %s, error: %v\n", peer.ID.String(), err)
 			} else {
-				log.Infof("Connected to MDNS peer: %s", peer.ID.Pretty())
+				log.Infof("Connected to MDNS peer: %s", peer.ID.String())
 				anyConnected = true
 			}
 		}

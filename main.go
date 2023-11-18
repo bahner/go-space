@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 
-	"github.com/bahner/go-myspace/app"
-	"github.com/bahner/go-myspace/global"
-	"github.com/bahner/go-myspace/keeper"
+	"github.com/bahner/go-space/app"
+	"github.com/bahner/go-space/global"
+	"github.com/bahner/go-space/keeper"
 
-	"github.com/bahner/go-myspace/config"
+	"github.com/bahner/go-space/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -26,7 +26,7 @@ func main() {
 
 	_secret := []byte("secret")
 
-	k := keeper.New("myspace")
+	k := keeper.New("space")
 	defer k.Close()
 
 	safe_secret, err := keeper.Encrypt(k, _secret)
