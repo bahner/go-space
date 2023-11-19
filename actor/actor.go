@@ -12,14 +12,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	MESSAGES_BUFFERSIZE = 100
-	REPL_BUFFERSIZE     = 100
-)
+const MESSAGES_BUFFERSIZE = 100
 
 type Actor struct {
+
+	// This context is used to cancel the Listen() function.
 	Ctx context.Context
 
+	// All actors must be entities.
 	Entity *entity.Entity
 
 	// The Inbox is the subscription to the topic where we receive envelopes from other actors.
@@ -34,10 +34,6 @@ type Actor struct {
 	// That is a TODO.
 	// We receive the message contents here after verification or decryption.
 	Messages chan *msg.Message
-
-	// REPL channel for sending commands to the actor.
-	// Messages are probably sent here from the Messages channel, after verification
-	REPL chan string
 }
 
 // Creates a new actor from an entity.
@@ -65,7 +61,6 @@ func New(ctx context.Context, ps *pubsub.PubSub, e *entity.Entity, forcePublish 
 
 	// Set the messages channel
 	a.Messages = make(chan *msg.Message, MESSAGES_BUFFERSIZE)
-	a.REPL = make(chan string, REPL_BUFFERSIZE)
 
 	// Publish the entity
 	err = a.Entity.Publish(forcePublish)

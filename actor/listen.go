@@ -26,9 +26,6 @@ func (a *Actor) Listen(outputChannel chan<- string) error {
 	// Assuming you have a similar function for Space
 	go a.handleSpaceSubscription(spaceSub)
 
-	// Start a goroutine for REPL
-	go a.HandleREPL(outputChannel)
-
 	// Wait for context cancellation (or other exit conditions)
 	<-a.Ctx.Done()
 	return a.Ctx.Err()
