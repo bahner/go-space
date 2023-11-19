@@ -11,13 +11,10 @@ import (
 
 func initPubSubService(ctx context.Context, wg *sync.WaitGroup, host *host.P2pHost) {
 
-	defer wg.Done()
-
 	// Start libp2p node and discover peers
-	host.StartPeerDiscovery(ctx, config.Rendezvous)
+	host.StartPeerDiscovery(ctx, wg, config.Rendezvous)
 
-	pubSubService = pubsub.New(host)
-	pubSubService.Start(ctx)
+	pubSubService = pubsub.New(ctx, host)
 
 }
 
