@@ -8,7 +8,7 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
 
-func (a *Actor) receiveFromInbox(sub *pubsub.Subscription) (*msg.Message, error) {
+func (a *Actor) receivePrivateEnvelopes(sub *pubsub.Subscription) (*msg.Message, error) {
 
 	msgData, err := sub.Next(a.Ctx)
 	if err != nil {
@@ -28,7 +28,7 @@ func (a *Actor) receiveFromInbox(sub *pubsub.Subscription) (*msg.Message, error)
 	return message, nil
 }
 
-func (a *Actor) handleInboxSubscription(sub *pubsub.Subscription) {
+func (a *Actor) handlePrivateMessages(sub *pubsub.Subscription) {
 	for {
 		select {
 		case <-a.Ctx.Done():
@@ -36,7 +36,7 @@ func (a *Actor) handleInboxSubscription(sub *pubsub.Subscription) {
 			return
 		default:
 			// Read message from Inbox subscription
-			if msg, err := a.receiveFromInbox(sub); err == nil {
+			if msg, err := a.receivePrivateEnvelopes(sub); err == nil {
 				a.Messages <- msg
 			}
 		}

@@ -20,12 +20,18 @@ type Actor struct {
 	Ctx context.Context
 
 	// All actors must be entities.
+	// Ideally they should be the same, but then ma becomes a bit too opinionated.
 	Entity *entity.Entity
 
-	// The Inbox is the subscription to the topic where we receive envelopes from other actors.
-	Inbox *pubsub.Topic
-	// The Space or room we are in. We basically receive signed messages from the room we're in here.
-	Space *pubsub.Topic
+	// Private is the topic where we receive envelopes from other actors.
+	// It's basically a private channel with the DIDDocument keyAgreement as topic.
+	Private *pubsub.Topic
+
+	// We basically receive signed messages from the room we're in here.
+	// It's basically a public channel with the assertionMethod from the DIDDocument of
+	// the room we're in as topic.
+	// Others can subscribe to this topic and send us messages, as long as they are signed.
+	Public *pubsub.Topic
 
 	// Incoming messages from the actor to AssertionMethod topic. It's bascially a broadcast channel.
 	// But you could use it to send messages to a specific actor or to all actors in a group.
@@ -48,13 +54,13 @@ func New(ctx context.Context, ps *pubsub.PubSub, e *entity.Entity, forcePublish 
 	a.Entity = e
 
 	// Create topic for incoming envelopes
-	a.Inbox, err = ps.Join(a.Entity.Doc.KeyAgreement)
+	a.Private, err = ps.Join(a.Entity.Doc.KeyAgreement)
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to join topic: %v", err)
 	}
 
 	// Create subscription to topic for incoming messages
-	a.Space, err = ps.Join(a.Entity.Doc.AssertionMethod)
+	a.Public, err = ps.Join(a.Entity.Doc.AssertionMethod)
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to join topic: %v", err)
 	}
