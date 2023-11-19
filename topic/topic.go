@@ -1,9 +1,10 @@
 package topic
 
 import (
+	"fmt"
 	"sync"
 
-	"github.com/bahner/go-space/ps"
+	mapubsub "github.com/bahner/go-ma/p2p/pubsub"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,7 +20,10 @@ type Topic struct {
 
 func New(topicID string) (*Topic, error) {
 
-	service := ps.GetService()
+	service, err := mapubsub.Get()
+	if err != nil {
+		return nil, fmt.Errorf("topic: error getting pubsub service: %s", err)
+	}
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
 	topic, ok := topics.Load(topicID)

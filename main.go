@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"sync"
 
 	"github.com/bahner/go-space/app"
-	"github.com/bahner/go-space/ps"
 
 	"github.com/bahner/go-space/config"
 )
@@ -13,15 +11,12 @@ import (
 func main() {
 
 	ctx := context.Background()
+	// discoveryCtx, _ := context.WithTimeout(ctx, 60*time.Second)
 
 	// Init config and logger
 	config.Init(ctx)
 
-	wg := &sync.WaitGroup{}
-	// Start background services
-	wg.Add(1)
-	ps.InitPubSubService(ctx, wg, config.Rendezvous)
-	wg.Wait()
+	// n, ps, err := p2p.Init(discoveryCtx)
 
 	// Start application
 	app.StartApplication(ctx)
