@@ -25,16 +25,14 @@ func New(opts ...libp2p.Option) (*P2pHost, error) {
 	return &P2pHost{h}, nil
 }
 
-func (h *P2pHost) StartPeerDiscovery(ctx context.Context, wg *sync.WaitGroup, rendezvous string) {
-
-	defer wg.Done()
+func (h *P2pHost) StartPeerDiscovery(ctx context.Context, rendezvous string) {
 
 	log.Debug("Starting peer discovery...")
 
-	wgDiscovery := &sync.WaitGroup{}
-	wgDiscovery.Add(2)
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
 	go DiscoverDHTPeers(ctx, wg, h, rendezvous)
 	go DiscoverMDNSPeers(ctx, wg, h, rendezvous)
-	wgDiscovery.Wait()
+	wg.Wait()
 	log.Info("Peer discovery finished.")
 }

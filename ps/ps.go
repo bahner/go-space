@@ -26,10 +26,7 @@ func InitPubSubService(ctx context.Context, wg *sync.WaitGroup, rendezvous strin
 	// vaultAddr := config.VaultAddr
 	// vaultToken := config.VaultToken
 
-	wgDiscovery := &sync.WaitGroup{}
-	wgDiscovery.Add(1)
-	go host.StartPeerDiscovery(ctx, wgDiscovery, rendezvous)
-	wgDiscovery.Wait()
+	host.StartPeerDiscovery(ctx, rendezvous)
 
 	pubSubService, err = pubsub.NewGossipSub(ctx, host)
 	if err != nil {
