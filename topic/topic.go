@@ -3,8 +3,8 @@ package topic
 import (
 	"sync"
 
-	"github.com/bahner/go-space/global"
-	p2p_pubsub "github.com/libp2p/go-libp2p-pubsub"
+	"github.com/bahner/go-space/ps"
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -13,13 +13,13 @@ var (
 )
 
 type Topic struct {
-	PubSubTopic *p2p_pubsub.Topic
+	PubSubTopic *pubsub.Topic
 	TopicID     string
 }
 
 func New(topicID string) (*Topic, error) {
 
-	ps := global.GetPubSubService()
+	service := ps.GetService()
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
 	topic, ok := topics.Load(topicID)
@@ -31,7 +31,7 @@ func New(topicID string) (*Topic, error) {
 	}
 
 	log.Debugf("Topic: %s not found in topics map, creating new topic", topicID)
-	pubSubTopic, err := ps.Sub.Join(topicID)
+	pubSubTopic, err := service.Join(topicID)
 	if err != nil {
 		log.Errorf("Error joining topic: %s", err)
 		return nil, err

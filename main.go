@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
+	"sync"
 
 	"github.com/bahner/go-space/app"
-	"github.com/bahner/go-space/global"
-	"github.com/bahner/go-space/keeper"
+	"github.com/bahner/go-space/ps"
 
 	"github.com/bahner/go-space/config"
-	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -18,22 +17,14 @@ func main() {
 	// Init config and logger
 	config.Init(ctx)
 
+	wg := &sync.WaitGroup{}
 	// Start background services
-	global.InitAndStartServices(ctx)
+	wg.Add(1)
+	ps.InitPubSubService(ctx, wg, config.Rendezvous)
+	wg.Wait()
 
 	// Start application
 	app.StartApplication(ctx)
-
-	_secret := []byte("secret")
-
-	k := keeper.New("space")
-	defer k.Close()
-
-	safe_secret, err := keeper.Encrypt(k, _secret)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Warnf("safe_secret: %v", safe_secret)
 
 	select {}
 }

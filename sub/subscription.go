@@ -1,4 +1,4 @@
-package subscription
+package sub
 
 import (
 	"context"
@@ -6,14 +6,14 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-space/config"
-	"github.com/bahner/go-space/global"
+	"github.com/bahner/go-space/ps"
 	"github.com/bahner/go-space/topic"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 	log "github.com/sirupsen/logrus"
 )
 
-var ps = global.GetPubSubService()
+var service = ps.GetService()
 
 type Subscription struct {
 	gen.Server
@@ -80,7 +80,7 @@ func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Se
 		return result, gen.ServerStatusOK
 	case "get_topics":
 		log.Debug("Received get_topics message.")
-		result := ps.Sub.GetTopics()
+		result := service.GetTopics()
 		return result, gen.ServerStatusOK
 	default:
 		log.Debugf("Received unknown message: %s\n", data)

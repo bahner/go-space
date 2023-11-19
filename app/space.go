@@ -9,7 +9,7 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-space/config"
-	"github.com/bahner/go-space/subscription"
+	"github.com/bahner/go-space/sub"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 
@@ -76,7 +76,7 @@ func subscribeTopic(ctx context.Context, topicID string) {
 
 	log.Debugf("Subscribing to topic: %s", topicID)
 
-	sub := subscription.New(ctx, topicID)
+	sub := sub.New(ctx, topicID)
 	log.Debugf("Subscription: %s", sub)
 
 	process, err := n.Spawn(topicID, gen.ProcessOptions{}, sub, topicID)
