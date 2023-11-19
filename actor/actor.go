@@ -59,6 +59,6 @@ func NewFromKeyset(k *set.Keyset, forcePublish bool) (*Actor, error) {
 	// 	return nil, fmt.Errorf("new_actor: Failed to subscribe to topic: %v", err)
 	// }
 
-	log.Debugf("new_actor: Actor initialized: %s", a.DID.Fragment)
+	log.Debugf("new_actor: Actor initialized: %s", a.Entity.DID.Fragment)
 	return a, nil
 }

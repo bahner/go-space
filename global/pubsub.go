@@ -14,7 +14,6 @@ func initPubSubService(ctx context.Context, wg *sync.WaitGroup, host *host.P2pHo
 	defer wg.Done()
 
 	// Start libp2p node and discover peers
-	host.Init(ctx)
 	host.StartPeerDiscovery(ctx, config.Rendezvous)
 
 	pubSubService = pubsub.New(host)

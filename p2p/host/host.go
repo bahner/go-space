@@ -2,6 +2,7 @@ package host
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	libp2p "github.com/libp2p/go-libp2p"
@@ -10,22 +11,18 @@ import (
 )
 
 type P2pHost struct {
-	Node host.Host
+	host.Host
 }
 
-func New() *P2pHost {
-	return &P2pHost{}
-}
+func New(opts ...libp2p.Option) (*P2pHost, error) {
 
-func (h *P2pHost) Init(ctx context.Context) {
-
-	var err error
-	log.Info("Starting libp2p node...")
-	h.Node, err = libp2p.New(libp2p.ListenAddrStrings())
+	h, err := libp2p.New(opts...)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("p2p_host: Failed to create libp2p host: %v", err)
 	}
-	log.Info("libp2p node created: ", h.Node.ID().String())
+	log.Info("libp2p node created: ", h.ID().String())
+
+	return &P2pHost{h}, nil
 }
 
 func (h *P2pHost) StartPeerDiscovery(ctx context.Context, rendezvous string) {
@@ -34,7 +31,7 @@ func (h *P2pHost) StartPeerDiscovery(ctx context.Context, rendezvous string) {
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
-	go discoverDHTPeers(ctx, wg, h.Node, rendezvous)
-	go discoverMDNSPeers(ctx, wg, h.Node, rendezvous)
+	go discoverDHTPeers(ctx, wg, h, rendezvous)
+	go discoverMDNSPeers(ctx, wg, h, rendezvous)
 	wg.Wait()
 }

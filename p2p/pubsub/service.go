@@ -23,7 +23,7 @@ func (p *Service) Start(ctx context.Context) {
 	var err error
 
 	log.Debug("Starting pubsub service...")
-	p.Sub, err = pubsub.NewGossipSub(ctx, p.Host.Node)
+	p.Sub, err = pubsub.NewGossipSub(ctx, p.Host)
 	if err != nil {
 		log.Fatal(err)
 	}

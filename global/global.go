@@ -18,7 +18,10 @@ var (
 
 func InitAndStartServices(ctx context.Context) {
 
-	host := host.New()
+	host, err := host.New()
+	if err != nil {
+		log.Fatalf("Failed to create libp2p host: %v", err)
+	}
 	vaultAddr := config.VaultAddr
 	vaultToken := config.VaultToken
 
