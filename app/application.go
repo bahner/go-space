@@ -42,5 +42,5 @@ func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 func (app *Application) Start(process gen.Process, args ...etf.Term) {
 	appName := config.AppName
 
-	log.Infof("Application %s started with Pid %s\n", appName, process.Self())
+	log.Infof("Application %s started with Pid %s", appName, process.Self())
 }

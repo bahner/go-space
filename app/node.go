@@ -23,7 +23,7 @@ func StartApplication(ctx context.Context) {
 	nodeCookie := config.NodeCookie
 	appName := config.AppName
 
-	log.Infof("Starting %s Erlang Application node: %s (%s)\n", appName, nodeName, nodeCookie)
+	log.Infof("Starting %s Erlang Application node: %s (%s)", appName, nodeName, nodeCookie)
 
 	var options node.Options
 	var err error

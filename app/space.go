@@ -40,20 +40,20 @@ func (gr *SPACE) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
 func (gr *SPACE) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
 
-	log.Infof("Creating new topic subscription with no reply: %s\n", message)
+	log.Infof("Creating new topic subscription with no reply: %s", message)
 	return gen.ServerStatusOK
 }
 
 func (gr *SPACE) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
 
-	log.Debugf("Creating new topic with a reply: %s\n", message)
+	log.Debugf("Creating new topic with a reply: %s", message)
 
 	t, err := extractTopic(message)
 	if err != nil {
 		return nil, gen.ServerStatusIgnore
 	}
 
-	log.Debugf("Extracted topic from message: %s\n", t)
+	log.Debugf("Extracted topic from message: %s", t)
 
 	subscribeTopic(gr.ctx, t)
 
@@ -65,7 +65,7 @@ func (gr *SPACE) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFro
 }
 
 func (gr *SPACE) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
-	log.Debugf("Received message: %s\n", message)
+	log.Debugf("Received message: %s", message)
 	return gen.ServerStatusOK
 }
 
