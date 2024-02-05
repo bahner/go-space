@@ -43,7 +43,7 @@ image:
 		--build-arg "BUILD_IMAGE=$(BUILD_IMAGE)" \
 		.
 
-install:
+install: default
 	sudo install -Dm755 $(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
 
 run: clean $(NAME)

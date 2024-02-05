@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"errors"
+	"time"
 
+	"github.com/bahner/go-ma/did"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 	p2ppubsub "github.com/libp2p/go-libp2p-pubsub"
@@ -21,6 +23,13 @@ type Subscription struct {
 
 func New(id string) gen.ServerBehavior {
 
+	// In this context id is a DID
+	// Lets not create a subscription if the DID is not valid
+	if !did.IsValidDID(id) {
+		log.Errorf("Invalid DID: %s", id)
+		return nil
+	}
+
 	log.Debugf("Creating new topic subscription: %s", id)
 
 	topic, err := getOrCreateTopic(id)
@@ -31,7 +40,9 @@ func New(id string) gen.ServerBehavior {
 
 	log.Debugf("Created topic: %s", topic.String())
 
-	owner := createOwnerProcessId(id)
+	// The owner is identified by the fragment of the DID
+	// It's the local name ad ID of the owner of the entity
+	owner := createOwnerProcessId(did.GetFragment(id))
 	log.Debugf("Created owner process id: %s", owner)
 
 	return &Subscription{
@@ -108,25 +119,31 @@ func (s *Subscription) subscriptionLoop() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	var sid = s.topic.String()
+	// Start a debug loop if log level is debug
+	if log.GetLevel() == log.DebugLevel {
+		go s.debugLoop()
+	}
 
-	log.Infof("Starting to listen for messages on topic: %s", sid)
+	var t = s.topic.String()
+
+	log.Infof("Starting to listen for messages on topic: %s", t)
 
 	for {
-		log.Debugf("Waiting for next message in topic: %s", sid)
+		log.Debugf("Waiting for next message in topic: %s", t)
 		msg, err := s.sub.Next(ctx)
 		if err != nil {
 			log.Errorf("Error getting next message: %v", err)
+			log.Infof("Canceling subscription to topic: %s", t)
 			continue
 		}
 		log.Debugf("Received message: %s", msg.GetData())
-		s.sendMessageToOwner(msg.GetData())
+		s.deliverMessage(msg.GetData())
 	}
 }
 
-func (s *Subscription) sendMessageToOwner(data []byte) error {
-	log.Debugf("Sending message to: %s", s.owner)
+func (s *Subscription) deliverMessage(data []byte) error {
 
+	log.Debugf("Delivering message: %s to owner: %s", data, s.owner)
 	err := s.sp.Process.Send(s.owner, etf.Term(data))
 	if err != nil {
 		log.Error(err)
@@ -136,8 +153,11 @@ func (s *Subscription) sendMessageToOwner(data []byte) error {
 }
 
 func createOwnerProcessId(id string) gen.ProcessID {
+
+	fragment := did.GetFragment(id)
+
 	return gen.ProcessID{
-		Name: id,
+		Name: fragment,
 		Node: viper.GetString("node.space"),
 	}
 }
@@ -161,4 +181,29 @@ func extractActionData(term etf.Term) (etf.Atom, []etf.Term, error) {
 
 	// Return the command and the rest of the tuple
 	return command, tuple[1:], nil
+}
+
+func (s *Subscription) Terminate(sp *gen.ServerProcess, reason string) {
+
+	// Close the topic.
+	s.topic.Close()
+
+	sp.Kill()
+
+	log.Debugf("Terminating subscription: %s", reason)
+}
+
+func (s *Subscription) debugLoop() {
+
+	for {
+
+		if s.sub == nil {
+			log.Debugf("Subscription: %s is nil.", s.sub.Topic())
+			return
+		} else {
+			log.Debugf("Subscription: %s is alive with peers: %v", s.topic.String(), s.topic.ListPeers())
+		}
+		time.Sleep(viper.GetDuration("node.debug_interval"))
+	}
+
 }

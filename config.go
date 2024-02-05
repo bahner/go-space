@@ -1,14 +1,17 @@
 package main
 
 import (
+	"time"
+
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
 const (
-	defautSpaceNodeName = "space@localhost"
-	defaultNodeCookie   = "SPACE™"
-	defaultNodeName     = "pubsub@localhost"
+	defautSpaceNodeName      = "space@localhost"
+	defaultNodeCookie        = "spacecookie"
+	defaultNodeName          = "pubsub@localhost"
+	defaultNodeDebugInterval = time.Second * 60
 )
 
 func init() {
@@ -25,5 +28,9 @@ func init() {
 	pflag.String("nodename", defaultNodeName, "Name of the erlang node")
 	viper.BindPFlag("node.name", pflag.Lookup("nodename"))
 	viper.SetDefault("node.name", defaultNodeName)
+
+	pflag.Duration("node_debug_interval", defaultNodeDebugInterval, "Interval for debug output")
+	viper.BindPFlag("node.debug_interval", pflag.Lookup("_node_debug_interval"))
+	viper.SetDefault("node.debug_interval", defaultNodeDebugInterval)
 
 }

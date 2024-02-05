@@ -3,7 +3,8 @@ module github.com/bahner/go-space
 go 1.21
 
 require (
-	github.com/bahner/go-ma-actor v0.0.6
+	github.com/bahner/go-ma v0.4.0
+	github.com/bahner/go-ma-actor v0.0.7-0.20240205202328-a9d0f596f9df
 	github.com/ergo-services/ergo v1.999.224
 	github.com/libp2p/go-libp2p-pubsub v0.10.0
 	github.com/sirupsen/logrus v1.9.3
@@ -13,7 +14,6 @@ require (
 
 require (
 	gitee.com/rupy/go_utils v0.5.12 // indirect
-	github.com/bahner/go-ma v0.4.0 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
