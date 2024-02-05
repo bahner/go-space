@@ -1,4 +1,4 @@
-package sub
+package app
 
 import (
 	"context"
@@ -22,7 +22,7 @@ type Subscription struct {
 	sub    *p2ppubsub.Subscription
 }
 
-func New(id string) gen.ServerBehavior {
+func NewTopic(id string) gen.ServerBehavior {
 
 	log.Debugf("Creating new topic subscription: %s", id)
 

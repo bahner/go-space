@@ -7,9 +7,9 @@ package app
 import (
 	"fmt"
 
-	"github.com/bahner/go-space/sub"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+	"github.com/spf13/viper"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,7 +19,7 @@ type SPACE struct {
 }
 
 func (gr *SPACE) Init(sp *gen.ServerProcess, args ...etf.Term) error {
-	appName := NAME
+	appName := viper.GetString("node.name")
 
 	log.Infof("Initializing %s GenServer", appName)
 
@@ -65,7 +65,7 @@ func subscribeTopic(topicID string) {
 
 	log.Debugf("Subscribing to topic: %s", topicID)
 
-	sub := sub.New(topicID)
+	sub := NewTopic(topicID)
 	log.Debugf("Subscription: %s", sub)
 
 	process, err := n.Spawn(topicID, gen.ProcessOptions{}, sub, topicID)
