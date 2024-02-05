@@ -18,7 +18,9 @@ type Node struct {
 
 var n node.Node
 
-func StartApplication(ctx context.Context) {
+func StartApplication() {
+
+	ctx := context.Background()
 
 	nodeName := viper.GetString("node.name")
 	nodeCookie := viper.GetString("node.cookie")
@@ -32,7 +34,7 @@ func StartApplication(ctx context.Context) {
 
 	// Create applications that must be started
 	apps := []gen.ApplicationBehavior{
-		createApplication(ctx),
+		new(Application),
 	}
 	options.Applications = apps
 
@@ -43,7 +45,7 @@ func StartApplication(ctx context.Context) {
 	}
 
 	// Starting applications
-	process, err = n.Spawn("space", gen.ProcessOptions{}, createSPACE(ctx))
+	process, err = n.Spawn("space", gen.ProcessOptions{}, new(SPACE))
 	if err != nil {
 		panic(err)
 	}

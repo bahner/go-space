@@ -5,7 +5,6 @@ package app
 // SPACE supervision tree
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/bahner/go-space/config"
@@ -18,15 +17,6 @@ import (
 
 type SPACE struct {
 	gen.Server
-	ctx context.Context
-}
-
-func createSPACE(ctx context.Context) gen.ServerBehavior {
-
-	return &SPACE{
-		ctx: ctx,
-	}
-
 }
 
 func (gr *SPACE) Init(sp *gen.ServerProcess, args ...etf.Term) error {
@@ -55,7 +45,7 @@ func (gr *SPACE) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFro
 
 	log.Debugf("Extracted topic from message: %s", t)
 
-	subscribeTopic(gr.ctx, t)
+	subscribeTopic(t)
 
 	msg := etf.Tuple{
 		etf.Atom("go_space_created_topic"),
@@ -69,14 +59,14 @@ func (gr *SPACE) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) 
 	return gen.ServerStatusOK
 }
 
-func subscribeTopic(ctx context.Context, topicID string) {
+func subscribeTopic(topicID string) {
 
 	n = getNode()
 	log.Debugf("Node name: %s is alive. %t", n.Name(), n.IsAlive())
 
 	log.Debugf("Subscribing to topic: %s", topicID)
 
-	sub := sub.New(ctx, topicID)
+	sub := sub.New(topicID)
 	log.Debugf("Subscription: %s", sub)
 
 	process, err := n.Spawn(topicID, gen.ProcessOptions{}, sub, topicID)

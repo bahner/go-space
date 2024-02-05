@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-
 	"github.com/bahner/go-space/app"
 	"github.com/spf13/pflag"
 
@@ -11,9 +9,6 @@ import (
 
 func main() {
 
-	ctx := context.Background()
-	// discoveryCtx, _ := context.WithTimeout(ctx, 60*time.Second)
-
 	// Init config and logger
 	pflag.Parse()
 	config.Init()
@@ -21,7 +16,7 @@ func main() {
 	// n, ps, err := p2p.Init(discoveryCtx)
 
 	// Start application
-	app.StartApplication(ctx)
+	app.StartApplication()
 
 	select {}
 }

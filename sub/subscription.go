@@ -15,11 +15,10 @@ import (
 type Subscription struct {
 	gen.Server
 	topic *topic.Topic
-	ctx   context.Context
 	owner gen.ProcessID
 }
 
-func New(ctx context.Context, id string) gen.ServerBehavior {
+func New(id string) gen.ServerBehavior {
 
 	log.Debugf("Creating new topic subscription: %s", id)
 
@@ -36,7 +35,6 @@ func New(ctx context.Context, id string) gen.ServerBehavior {
 
 	return &Subscription{
 		topic: topic,
-		ctx:   ctx,
 		owner: owner,
 	}
 }
@@ -99,7 +97,6 @@ func (gr *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf
 func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 
 	var sid = s.topic.TopicID
-	var ctx = s.ctx
 
 	log.Infof("Starting to listen for messages on topic: %s", sid)
 
@@ -112,7 +109,7 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 
 	for {
 		log.Debugf("Waiting for next message in topic: %s", sid)
-		msg, err := sub.Next(ctx)
+		msg, err := sub.Next(context.Background())
 		if err != nil {
 			log.Errorf("Error getting next message: %v", err)
 			continue
