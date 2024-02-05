@@ -1,4 +1,4 @@
-package app
+package main
 
 // This genserver is started by the SPACE
 // It is used to add children, ie. topics to the

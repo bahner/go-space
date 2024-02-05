@@ -55,8 +55,8 @@ github.com/aliyun/credentials-go v1.1.2/go.mod h1:ozcZaMR5kLM7pwtCMEpVmQ242suV6q
 github.com/anmitsu/go-shlex v0.0.0-20161002113705-648efa622239/go.mod h1:2FmKhYUyUczH0OGQWaF5ceTx0UBShxjsH6f8oGKYe2c=
 github.com/bahner/go-ma v0.4.0 h1:JKHdjwzFwHakwe521ozJhLelCUgTqcuKtXAMnM2n7C0=
 github.com/bahner/go-ma v0.4.0/go.mod h1:WM8wAs1tYjIuQLnM5kGkOo177N0dRQ4bXO4p/t63w+E=
-github.com/bahner/go-ma-actor v0.0.7-0.20240205202328-a9d0f596f9df h1:fJia+MMuXpXwKm7OFKFRnzl3NtzZU6ZICbxcv9aglWk=
-github.com/bahner/go-ma-actor v0.0.7-0.20240205202328-a9d0f596f9df/go.mod h1:CEE0PwjKktRw7XnyP7Z8UgscsqhD8VE+gLMfO8ABqk8=
+github.com/bahner/go-ma-actor v0.0.6 h1:sDSg9J+wGk19wz/uWbs1yEaqhz+QiY8PyHCTV5RQhRY=
+github.com/bahner/go-ma-actor v0.0.6/go.mod h1:CEE0PwjKktRw7XnyP7Z8UgscsqhD8VE+gLMfO8ABqk8=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/clock v1.3.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/clock v1.3.5 h1:VvXlSJBzZpA/zum6Sj74hxwYI2DIxRWuNIoXAzHZz5o=

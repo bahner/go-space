@@ -1,10 +1,10 @@
-module github.com/bahner/go-space
+module go-space
 
-go 1.21
+go 1.21.6
 
 require (
 	github.com/bahner/go-ma v0.4.0
-	github.com/bahner/go-ma-actor v0.0.7-0.20240205202328-a9d0f596f9df
+	github.com/bahner/go-ma-actor v0.0.6
 	github.com/ergo-services/ergo v1.999.224
 	github.com/libp2p/go-libp2p-pubsub v0.10.0
 	github.com/sirupsen/logrus v1.9.3

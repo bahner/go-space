@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/bahner/go-ma-actor/p2p"
-	"github.com/bahner/go-space/app"
 	"github.com/spf13/pflag"
 
 	"github.com/bahner/go-ma-actor/config"
@@ -29,7 +28,7 @@ func main() {
 	go p.DiscoveryLoop(context.Background())
 
 	// Start application
-	app.StartApplication(p)
+	StartApplication(p)
 
 	select {}
 }
