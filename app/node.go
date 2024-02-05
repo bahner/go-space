@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 
+	"github.com/bahner/go-ma-actor/p2p"
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
 	"github.com/ergo-services/ergo/node"
@@ -11,21 +12,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Node struct {
-	node.Node
-}
+var (
+	n node.Node
+	p *p2p.P2P
+)
 
-var n node.Node
-
-func StartApplication() {
+func StartApplication(_p2p *p2p.P2P) {
 
 	ctx := context.Background()
+	p = _p2p
 
 	nodeName := viper.GetString("node.name")
 	nodeCookie := viper.GetString("node.cookie")
-	appName := NAME
 
-	log.Infof("Starting %s Erlang Application node: %s (%s)", appName, nodeName, nodeCookie)
+	log.Infof("Starting %s Erlang Application node: %s (%s)", NAME, nodeName, nodeCookie)
 
 	var options node.Options
 	var err error

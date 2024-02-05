@@ -44,7 +44,7 @@ image:
 		.
 
 install:
-	install -Dm755 $(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
+	sudo install -Dm755 $(NAME) $(DESTDIR)$(PREFIX)/bin/$(NAME)
 
 run: clean $(NAME)
 	./$(NAME)

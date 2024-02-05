@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/bahner/go-ma-actor/p2p/pubsub"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 	p2ppubsub "github.com/libp2p/go-libp2p-pubsub"
@@ -14,15 +13,13 @@ import (
 
 type Subscription struct {
 	gen.Server
-	Cancel context.CancelFunc
-	Ctx    context.Context
-	topic  *p2ppubsub.Topic
-	owner  gen.ProcessID
-	sp     *gen.ServerProcess
-	sub    *p2ppubsub.Subscription
+	topic *p2ppubsub.Topic
+	owner gen.ProcessID
+	sp    *gen.ServerProcess
+	sub   *p2ppubsub.Subscription
 }
 
-func NewTopic(id string) gen.ServerBehavior {
+func New(id string) gen.ServerBehavior {
 
 	log.Debugf("Creating new topic subscription: %s", id)
 
@@ -45,7 +42,16 @@ func NewTopic(id string) gen.ServerBehavior {
 
 func (s *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
-	s.sp = sp
+	s.sp = sp // Unsure what this is for
+	var err error
+
+	log.Infof("Initialising subscription to: %s", s.topic.String())
+
+	s.sub, err = s.topic.Subscribe()
+	if err != nil {
+		log.Errorf("Error subscribing to topic: %s", s.topic.String())
+		return err
+	}
 
 	log.Infof("Subscription init subscribing to topic: %s", s.topic.String())
 	go s.subscriptionLoop() // <-- Error is here. Subscription is not working.
@@ -69,23 +75,22 @@ func (s *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Ser
 	}
 
 	switch action {
+
 	case "publish":
 		log.Debugf("Received publish message: %s", data)
 		s.topic.Publish(context.Background(), data[0].([]byte))
 		return etf.Atom("ok"), gen.ServerStatusOK
+
 	case "list_peers":
 		log.Debug("Received list_peers message.")
 		result := s.topic.ListPeers()
 		return result, gen.ServerStatusOK
+
 	case "get_topics":
 		log.Debug("Received get_topics message.")
-		ps := pubsub.Get()
-		if ps == nil {
-			log.Errorf("Error getting pubsub service")
-			return "error", gen.ServerStatusOK
-		}
-		result := ps.GetTopics()
+		result := p.PubSub.GetTopics()
 		return result, gen.ServerStatusOK
+
 	default:
 		log.Debugf("Received unknown message: %s", data)
 		return "error", gen.ServerStatusOK
@@ -100,20 +105,16 @@ func (s *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.
 
 func (s *Subscription) subscriptionLoop() {
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	var sid = s.topic.String()
 
 	log.Infof("Starting to listen for messages on topic: %s", sid)
 
-	sub, err := s.topic.Subscribe()
-	if err != nil {
-		log.Errorf("Error subscribing to topic: %s", sid)
-	}
-
-	log.Infof("Subscribed to topic: %s", sid)
-
 	for {
 		log.Debugf("Waiting for next message in topic: %s", sid)
-		msg, err := sub.Next(context.Background())
+		msg, err := s.sub.Next(ctx)
 		if err != nil {
 			log.Errorf("Error getting next message: %v", err)
 			continue
