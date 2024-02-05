@@ -2,23 +2,13 @@ package topic
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/bahner/go-ma-actor/p2p/pubsub"
 	p2ppubsub "github.com/libp2p/go-libp2p-pubsub"
 	log "github.com/sirupsen/logrus"
 )
 
-var (
-	topics sync.Map
-)
-
-type Topic struct {
-	PubSubTopic *p2ppubsub.Topic
-	TopicID     string
-}
-
-func New(topicID string) (*Topic, error) {
+func GetOrCreate(topicID string) (*p2ppubsub.Topic, error) {
 
 	service := pubsub.Get()
 	if service == nil {
@@ -26,27 +16,22 @@ func New(topicID string) (*Topic, error) {
 	}
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
-	topic, ok := topics.Load(topicID)
+	topic, ok := topics.Get(topicID)
 	if ok {
-		if t, ok := topic.(*Topic); ok {
+		if t, ok := topic.(*p2ppubsub.Topic); ok {
 			log.Debugf("Found topic: %s in topics map", topicID)
 			return t, nil
 		}
 	}
 
 	log.Debugf("Topic: %s not found in topics map, creating new topic", topicID)
-	pubSubTopic, err := service.Join(topicID)
+	t, err := service.Join(topicID)
 	if err != nil {
 		log.Errorf("Error joining topic: %s", err)
 		return nil, err
 	}
 
-	topic = &Topic{
-		PubSubTopic: pubSubTopic,
-		TopicID:     topicID,
-	}
+	topics.Set(topicID, t)
 
-	topics.Store(topicID, topic)
-
-	return topic.(*Topic), nil
+	return t, nil
 }
