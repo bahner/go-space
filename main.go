@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bahner/go-space/app"
+	"github.com/spf13/pflag"
 
 	"github.com/bahner/go-space/config"
 )
@@ -14,7 +15,8 @@ func main() {
 	// discoveryCtx, _ := context.WithTimeout(ctx, 60*time.Second)
 
 	// Init config and logger
-	config.Init(ctx)
+	pflag.Parse()
+	config.Init()
 
 	// n, ps, err := p2p.Init(discoveryCtx)
 

@@ -7,6 +7,7 @@ import (
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
 	"github.com/ergo-services/ergo/node"
+	"github.com/spf13/viper"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,9 +20,9 @@ var n node.Node
 
 func StartApplication(ctx context.Context) {
 
-	nodeName := config.NodeName
-	nodeCookie := config.NodeCookie
-	appName := config.AppName
+	nodeName := viper.GetString("node.name")
+	nodeCookie := viper.GetString("node.cookie")
+	appName := config.NAME
 
 	log.Infof("Starting %s Erlang Application node: %s (%s)", appName, nodeName, nodeCookie)
 

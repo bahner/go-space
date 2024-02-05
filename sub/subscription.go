@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
-	"github.com/bahner/go-ma/p2p/pubsub"
-	"github.com/bahner/go-space/config"
+	"github.com/bahner/go-ma-actor/p2p/pubsub"
 	"github.com/bahner/go-space/topic"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type Subscription struct {
@@ -77,9 +77,9 @@ func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Se
 		return result, gen.ServerStatusOK
 	case "get_topics":
 		log.Debug("Received get_topics message.")
-		ps, err := pubsub.Get()
-		if err != nil {
-			log.Errorf("Error getting pubsub service: %s", err)
+		ps := pubsub.Get()
+		if ps == nil {
+			log.Errorf("Error getting pubsub service")
 			return "error", gen.ServerStatusOK
 		}
 		result := ps.GetTopics()
@@ -136,7 +136,7 @@ func sendMessage(process *gen.ServerProcess, dst gen.ProcessID, data []byte) err
 func createOwnerProcessId(id string) gen.ProcessID {
 	return gen.ProcessID{
 		Name: id,
-		Node: config.SPACENodeName,
+		Node: viper.GetString("node.space"),
 	}
 }
 

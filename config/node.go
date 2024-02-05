@@ -6,24 +6,14 @@ import (
 )
 
 const (
-	// Erlang application config
-	VERSION = "0.0.1"
-	NAME    = "go-space"
-	DESC    = "SPACE node written in go to handle libp2p functionality."
+	defautSpaceNodeName = "space@localhost"
+	defaultNodeCookie   = "SPACE™"
+	defaultNodeName     = "pubsub@localhost"
 )
 
 func init() {
 
-	// Logging
-	pflag.String("loglevel", defaultLogLevel, "Loglevel to use for application")
-	viper.BindPFlag("log.level", pflag.Lookup("loglevel"))
-	viper.SetDefault("log.level", defaultLogLevel)
-
-	pflag.String("logfile", defaultLogFile, "Logfile to write logs to")
-	viper.BindPFlag("log.file", pflag.Lookup("logfile"))
-	viper.SetDefault("log.file", defaultLogFile)
-
-	// Erlang application config
+	// Erlang node config
 	pflag.String("spacenode", defautSpaceNodeName, "Name of the node running the actual SPACE")
 	viper.BindPFlag("node.space", pflag.Lookup("spacenode"))
 	viper.SetDefault("node.space", defautSpaceNodeName)
@@ -35,10 +25,5 @@ func init() {
 	pflag.String("nodename", defaultNodeName, "Name of the erlang node")
 	viper.BindPFlag("node.name", pflag.Lookup("nodename"))
 	viper.SetDefault("node.name", defaultNodeName)
-
-}
-func Init() {
-
-	initLogging()
 
 }

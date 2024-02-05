@@ -22,17 +22,13 @@ type Application struct {
 
 func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 
-	appName := config.AppName
-	description := config.Description
-	version := config.Version
-
 	return gen.ApplicationSpec{
-		Name:        appName,
-		Description: description,
-		Version:     version,
+		Name:        config.NAME,
+		Description: config.DESC,
+		Version:     config.VERSION,
 		Children: []gen.ApplicationChildSpec{
 			{
-				Name:  appName,
+				Name:  config.NAME,
 				Child: createSPACE(app.ctx),
 			},
 		},
@@ -40,7 +36,7 @@ func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 }
 
 func (app *Application) Start(process gen.Process, args ...etf.Term) {
-	appName := config.AppName
+	appName := config.NAME
 
 	log.Infof("Application %s started with Pid %s", appName, process.Self())
 }

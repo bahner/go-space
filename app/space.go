@@ -30,7 +30,7 @@ func createSPACE(ctx context.Context) gen.ServerBehavior {
 }
 
 func (gr *SPACE) Init(sp *gen.ServerProcess, args ...etf.Term) error {
-	appName := config.AppName
+	appName := config.NAME
 
 	log.Infof("Initializing %s GenServer", appName)
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	mapubsub "github.com/bahner/go-ma/p2p/pubsub"
-	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	"github.com/bahner/go-ma-actor/p2p/pubsub"
+	p2ppubsub "github.com/libp2p/go-libp2p-pubsub"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,15 +14,15 @@ var (
 )
 
 type Topic struct {
-	PubSubTopic *pubsub.Topic
+	PubSubTopic *p2ppubsub.Topic
 	TopicID     string
 }
 
 func New(topicID string) (*Topic, error) {
 
-	service, err := mapubsub.Get()
-	if err != nil {
-		return nil, fmt.Errorf("topic: error getting pubsub service: %s", err)
+	service := pubsub.Get()
+	if service == nil {
+		return nil, fmt.Errorf("topic: error getting pubsub service")
 	}
 
 	log.Debugf("Looking for topic: %s in topics map", topicID)
