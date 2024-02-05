@@ -1,10 +1,16 @@
 package app
 
 import (
-	"github.com/bahner/go-space/config"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
 	log "github.com/sirupsen/logrus"
+)
+
+const (
+	// Erlang application config
+	VERSION = "0.0.1"
+	NAME    = "go-space"
+	DESC    = "SPACE node written in go to handle libp2p functionality."
 )
 
 type Application struct {
@@ -14,12 +20,12 @@ type Application struct {
 func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 
 	return gen.ApplicationSpec{
-		Name:        config.NAME,
-		Description: config.DESC,
-		Version:     config.VERSION,
+		Name:        NAME,
+		Description: DESC,
+		Version:     VERSION,
 		Children: []gen.ApplicationChildSpec{
 			{
-				Name:  config.NAME,
+				Name:  NAME,
 				Child: new(SPACE),
 			},
 		},
@@ -27,7 +33,7 @@ func (app *Application) Load(args ...etf.Term) (gen.ApplicationSpec, error) {
 }
 
 func (app *Application) Start(process gen.Process, args ...etf.Term) {
-	appName := config.NAME
+	appName := NAME
 
 	log.Infof("Application %s started with Pid %s", appName, process.Self())
 }

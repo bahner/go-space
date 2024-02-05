@@ -5,30 +5,34 @@ import (
 	"errors"
 
 	"github.com/bahner/go-ma-actor/p2p/pubsub"
-	"github.com/bahner/go-space/topic"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
+	p2ppubsub "github.com/libp2p/go-libp2p-pubsub"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type Subscription struct {
 	gen.Server
-	topic *topic.Topic
-	owner gen.ProcessID
+	Cancel context.CancelFunc
+	Ctx    context.Context
+	topic  *p2ppubsub.Topic
+	owner  gen.ProcessID
+	sp     *gen.ServerProcess
+	sub    *p2ppubsub.Subscription
 }
 
 func New(id string) gen.ServerBehavior {
 
 	log.Debugf("Creating new topic subscription: %s", id)
 
-	topic, err := topic.New(id)
+	topic, err := getOrCreateTopic(id)
 	if err != nil {
 		log.Errorf("Error creating topic: %v", err)
 		return nil
 	}
 
-	log.Debugf("Created topic: %s", topic.TopicID)
+	log.Debugf("Created topic: %s", topic.String())
 
 	owner := createOwnerProcessId(id)
 	log.Debugf("Created owner process id: %s", owner)
@@ -39,22 +43,22 @@ func New(id string) gen.ServerBehavior {
 	}
 }
 
-func (gr *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
+func (s *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
-	topic_id := gr.topic.TopicID
+	s.sp = sp
 
-	log.Infof("Topic server subscribing to topic: %s", topic_id)
-	go subscribeTopic(sp, gr) // <-- Error is here. Subscription is not working.
+	log.Infof("Subscription init subscribing to topic: %s", s.topic.String())
+	go s.subscriptionLoop() // <-- Error is here. Subscription is not working.
 
 	return nil
 }
 
-func (gr *Subscription) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
+func (s *Subscription) HandleCast(server_procces *gen.ServerProcess, message etf.Term) gen.ServerStatus {
 	log.Debugf("Received message: %s", message)
 	return gen.ServerStatusOK
 }
 
-func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
+func (s *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
 
 	log.Debugf("Received message: %s from: %v", message, from)
 
@@ -67,11 +71,11 @@ func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Se
 	switch action {
 	case "publish":
 		log.Debugf("Received publish message: %s", data)
-		gr.topic.PubSubTopic.Publish(context.Background(), data[0].([]byte))
+		s.topic.Publish(context.Background(), data[0].([]byte))
 		return etf.Atom("ok"), gen.ServerStatusOK
 	case "list_peers":
 		log.Debug("Received list_peers message.")
-		result := gr.topic.PubSubTopic.ListPeers()
+		result := s.topic.ListPeers()
 		return result, gen.ServerStatusOK
 	case "get_topics":
 		log.Debug("Received get_topics message.")
@@ -89,18 +93,18 @@ func (gr *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Se
 
 }
 
-func (gr *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
+func (s *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
 	log.Debugf("Received message: %s", message)
 	return gen.ServerStatusOK
 }
 
-func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
+func (s *Subscription) subscriptionLoop() {
 
-	var sid = s.topic.TopicID
+	var sid = s.topic.String()
 
 	log.Infof("Starting to listen for messages on topic: %s", sid)
 
-	sub, err := s.topic.PubSubTopic.Subscribe()
+	sub, err := s.topic.Subscribe()
 	if err != nil {
 		log.Errorf("Error subscribing to topic: %s", sid)
 	}
@@ -115,14 +119,14 @@ func subscribeTopic(to *gen.ServerProcess, s *Subscription) {
 			continue
 		}
 		log.Debugf("Received message: %s", msg.GetData())
-		sendMessage(to, s.owner, msg.GetData())
+		s.sendMessageToOwner(msg.GetData())
 	}
 }
 
-func sendMessage(process *gen.ServerProcess, dst gen.ProcessID, data []byte) error {
-	log.Debugf("Sending message to: %s", dst)
+func (s *Subscription) sendMessageToOwner(data []byte) error {
+	log.Debugf("Sending message to: %s", s.owner)
 
-	err := process.Process.Send(dst, etf.Term(data))
+	err := s.sp.Process.Send(s.owner, etf.Term(data))
 	if err != nil {
 		log.Error(err)
 	}

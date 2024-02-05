@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 
-	"github.com/bahner/go-space/config"
 	"github.com/ergo-services/ergo"
 	"github.com/ergo-services/ergo/gen"
 	"github.com/ergo-services/ergo/node"
@@ -24,7 +23,7 @@ func StartApplication() {
 
 	nodeName := viper.GetString("node.name")
 	nodeCookie := viper.GetString("node.cookie")
-	appName := config.NAME
+	appName := NAME
 
 	log.Infof("Starting %s Erlang Application node: %s (%s)", appName, nodeName, nodeCookie)
 

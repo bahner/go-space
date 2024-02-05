@@ -7,7 +7,6 @@ package app
 import (
 	"fmt"
 
-	"github.com/bahner/go-space/config"
 	"github.com/bahner/go-space/sub"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
@@ -20,7 +19,7 @@ type SPACE struct {
 }
 
 func (gr *SPACE) Init(sp *gen.ServerProcess, args ...etf.Term) error {
-	appName := config.NAME
+	appName := NAME
 
 	log.Infof("Initializing %s GenServer", appName)
 
