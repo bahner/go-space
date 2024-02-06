@@ -42,10 +42,10 @@ func (gr *SPACE) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFro
 
 	log.Debugf("Extracted topic from message: %s", t)
 
-	subscribeTopic(t)
+	go subscribeTopic(t)
 
 	msg := etf.Tuple{
-		etf.Atom("go_space_created_topic"),
+		etf.Atom("go_space_creating_topic"),
 		etf.String(t)}
 
 	return msg, gen.ServerStatusOK

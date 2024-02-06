@@ -2,43 +2,70 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/bahner/go-ma-actor/entity"
 	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/msg"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
-	p2ppubsub "github.com/libp2p/go-libp2p-pubsub"
+	"github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
+const (
+	MESSAGE_CHANNEL_SIZE  = 100
+	ENVELOPE_CHANNEL_SIZE = 100
+)
+
 type Subscription struct {
 	gen.Server
-	topic *p2ppubsub.Topic
-	owner gen.ProcessID
-	sp    *gen.ServerProcess
-	sub   *p2ppubsub.Subscription
+	sp     *gen.ServerProcess
+	owner  gen.ProcessID
+	entity *entity.Entity
+
+	messages  chan *msg.Message
+	envelopes chan *msg.Envelope
+}
+
+func (s *Subscription) Verify() error {
+	if s.owner.Node == "" {
+		return fmt.Errorf("owner node is empty")
+	}
+	if s.owner.Name == "" {
+		return fmt.Errorf("owner name is empty")
+	}
+	if s.entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if s.messages == nil {
+		return fmt.Errorf("messages channel is nil")
+	}
+	if s.envelopes == nil {
+		return fmt.Errorf("envelopes channel is nil")
+	}
+	return nil
+}
+
+func (s *Subscription) IsValid() bool {
+	return s.Verify() == nil
 }
 
 func New(id string) gen.ServerBehavior {
 
-	// In this context id is a DID
-	// Lets not create a subscription if the DID is not valid
-	if !did.IsValidDID(id) {
-		log.Errorf("Invalid DID: %s", id)
-		return nil
-	}
+	log.Debugf("Creating new genServer: %s", id)
 
-	log.Debugf("Creating new topic subscription: %s", id)
-
-	topic, err := getOrCreateTopic(id)
+	entity, err := getOrCreateEntity(id)
 	if err != nil {
-		log.Errorf("Error creating topic: %v", err)
+		log.Errorf("Error creating entity: %v", err)
 		return nil
 	}
 
-	log.Debugf("Created topic: %s", topic.String())
+	log.Debugf("Created topic: %s", entity.Topic.String())
 
 	// The owner is identified by the fragment of the DID
 	// It's the local name ad ID of the owner of the entity
@@ -46,26 +73,21 @@ func New(id string) gen.ServerBehavior {
 	log.Debugf("Created owner process id: %s", owner)
 
 	return &Subscription{
-		topic: topic,
-		owner: owner,
+		owner:     owner,
+		entity:    entity,
+		messages:  make(chan *msg.Message, MESSAGE_CHANNEL_SIZE),
+		envelopes: make(chan *msg.Envelope, ENVELOPE_CHANNEL_SIZE),
 	}
 }
 
 func (s *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
-	s.sp = sp // Unsure what this is for
-	var err error
+	s.sp = sp // Save the server process, so we can send messages from it
 
-	log.Infof("Initialising subscription to: %s", s.topic.String())
-
-	s.sub, err = s.topic.Subscribe()
-	if err != nil {
-		log.Errorf("Error subscribing to topic: %s", s.topic.String())
-		return err
-	}
-
-	log.Infof("Subscription init subscribing to topic: %s", s.topic.String())
+	log.Infof("Subscription init subscribing to topic: %s", s.entity.DID.String())
 	go s.subscriptionLoop() // <-- Error is here. Subscription is not working.
+
+	sp.Process.Send(s.owner, etf.Atom(":go_space_topic_created"))
 
 	return nil
 }
@@ -89,12 +111,12 @@ func (s *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Ser
 
 	case "publish":
 		log.Debugf("Received publish message: %s", data)
-		s.topic.Publish(context.Background(), data[0].([]byte))
+		s.entity.Topic.Publish(context.Background(), data[0].([]byte))
 		return etf.Atom("ok"), gen.ServerStatusOK
 
 	case "list_peers":
 		log.Debug("Received list_peers message.")
-		result := s.topic.ListPeers()
+		result := s.entity.Topic.ListPeers()
 		return result, gen.ServerStatusOK
 
 	case "get_topics":
@@ -116,29 +138,94 @@ func (s *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.
 
 func (s *Subscription) subscriptionLoop() {
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	sub, err := s.entity.Subscribe()
+	if err != nil {
+		log.Errorf("Error subscribing to topic: %s", err)
+		return
+	}
+	defer sub.Cancel()
 
 	// Start a debug loop if log level is debug
 	if log.GetLevel() == log.DebugLevel {
 		go s.debugLoop()
 	}
 
-	var t = s.topic.String()
+	// Start the message and envelope handling loops
+	// which listen on the channels for messages and envelopes
+	go s.handleEnvelopesLoop()
+	go s.handleMessagesLoop()
+
+	var t = s.entity.Topic.String()
 
 	log.Infof("Starting to listen for messages on topic: %s", t)
 
 	for {
 		log.Debugf("Waiting for next message in topic: %s", t)
-		msg, err := s.sub.Next(ctx)
-		if err != nil {
-			log.Errorf("Error getting next message: %v", err)
-			log.Infof("Canceling subscription to topic: %s", t)
+		pubsubMessage, ok := <-sub.Messages
+		if !ok {
+			log.Infof("Subscription: %s closed.", t)
+			return
+		}
+
+		if s.handleMessage(pubsubMessage.Data) == nil {
+			log.Debugf("Message: %s handled.", pubsubMessage.Data)
 			continue
 		}
-		log.Debugf("Received message: %s", msg.GetData())
-		s.deliverMessage(msg.GetData())
+
+		if s.handleEnvelope(pubsubMessage.Data) == nil {
+			log.Debugf("Envelope: %s handled.", pubsubMessage.Data)
+			continue
+		}
+
+		log.Errorf("Error handling message: %s", pubsubMessage.Data)
+
 	}
+}
+
+func (s *Subscription) handleMessage(data []byte) error {
+
+	msg := new(msg.Message)
+	err := cbor.Unmarshal(data, msg)
+	if err != nil {
+		return fmt.Errorf("error unmarshaling message: %v", err)
+	}
+
+	// If the message is verified, we pass it on and continue prosessing new messages
+	if msg.Verify() != nil {
+		return fmt.Errorf("message not verified: %v", msg)
+	}
+
+	// Message is verified, we pass it on
+	s.messages <- msg
+
+	return nil
+}
+
+func (s *Subscription) handleEnvelope(data []byte) error {
+
+	envelope := new(msg.Envelope)
+	err := cbor.Unmarshal(data, envelope)
+	if err != nil {
+		return fmt.Errorf("error unmarshaling envelope: %v", err)
+	}
+
+	// Sanity check the envelope
+	if envelope.EncryptedContent == nil {
+		return fmt.Errorf("envelope not verified: %v", envelope)
+	}
+
+	if envelope.EncryptedHeaders == nil {
+		return fmt.Errorf("envelope not verified: %v", envelope)
+	}
+
+	if envelope.EphemeralKey == nil {
+		return fmt.Errorf("envelope not verified: %v", envelope)
+	}
+
+	// Seems OK, we pass it on
+	s.envelopes <- envelope
+
+	return nil
 }
 
 func (s *Subscription) deliverMessage(data []byte) error {
@@ -186,7 +273,8 @@ func extractActionData(term etf.Term) (etf.Atom, []etf.Term, error) {
 func (s *Subscription) Terminate(sp *gen.ServerProcess, reason string) {
 
 	// Close the topic.
-	s.topic.Close()
+	s.entity.Subscription.Cancel()
+	s.entity.Topic.Close()
 
 	sp.Kill()
 
@@ -197,13 +285,57 @@ func (s *Subscription) debugLoop() {
 
 	for {
 
-		if s.sub == nil {
-			log.Debugf("Subscription: %s is nil.", s.sub.Topic())
+		if s.entity.Subscription == nil {
+			log.Debugf("Subscription: %s is nil.", s.entity.Topic.String())
 			return
 		} else {
-			log.Debugf("Subscription: %s is alive with peers: %v", s.topic.String(), s.topic.ListPeers())
+			log.Debugf("Subscription: %s is alive with peers: %v", s.entity.Topic.String(), s.entity.Topic.ListPeers())
 		}
 		time.Sleep(viper.GetDuration("node.debug_interval"))
 	}
+}
 
+func (s *Subscription) handleEnvelopesLoop() {
+
+	for {
+		envelope, ok := <-s.envelopes
+		if !ok {
+			log.Infof("Envelopes channel for %s closed.", s.entity.Topic.String())
+			return
+		}
+		log.Debugf("Received envelope: %s", envelope)
+		msg, err := envelope.Open(s.entity.Keyset.EncryptionKey.PrivKey[:])
+		if err != nil {
+			log.Errorf("Error opening envelope: %s", err)
+			continue
+		}
+
+		if msg.Verify() != nil {
+			log.Errorf("Message not verified: %v", msg)
+			continue
+		}
+
+		s.messages <- msg
+	}
+}
+
+func (s *Subscription) handleMessagesLoop() {
+
+	for {
+		message, ok := <-s.messages
+		if !ok {
+			log.Infof("Messages channel for %s closed.", s.entity.Topic.String())
+			return
+		}
+
+		// Marshal the message and send it to the owner
+		msgJson, err := json.Marshal(message)
+		if err != nil {
+			log.Errorf("Error marshaling message: %s", err)
+			continue
+		}
+
+		// Send message as JSON to owner
+		s.deliverMessage(msgJson)
+	}
 }
