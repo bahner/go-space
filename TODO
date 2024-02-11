@@ -1,3 +1,5 @@
-Start an application and required supervisors in main. Then let the space dispatcher and children to that.
+# SPACEt™
 
-Add actors and spaces here? Maybe maybe not.
+## Keysets
+
+The vault / local storage of keysets is imperative at this point. There are too many race condidiotns and cache issues.

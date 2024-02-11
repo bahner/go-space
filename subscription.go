@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
@@ -156,15 +155,14 @@ func (s *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.
 	return gen.ServerStatusOK
 }
 
-func (s *Subscription) deliverMessage(data []byte) error {
+func (s *Subscription) Terminate(sp *gen.ServerProcess, reason string) {
 
-	log.Debugf("Delivering message: %s to owner: %s", data, s.owner)
-	err := s.sp.Process.Send(s.owner, etf.Term(data))
-	if err != nil {
-		log.Error(err)
-	}
+	// Close the topic.
+	s.entity.Cancel()
 
-	return nil
+	sp.Kill()
+
+	log.Debugf("Terminating subscription: %s", reason)
 }
 
 func createOwnerProcessId(id string) gen.ProcessID {
@@ -196,88 +194,6 @@ func extractActionData(term etf.Term) (etf.Atom, []etf.Term, error) {
 
 	// Return the command and the rest of the tuple
 	return command, tuple[1:], nil
-}
-
-func (s *Subscription) Terminate(sp *gen.ServerProcess, reason string) {
-
-	// Close the topic.
-	s.entity.Cancel()
-
-	sp.Kill()
-
-	log.Debugf("Terminating subscription: %s", reason)
-}
-
-func (s *Subscription) handleEnvelopesLoop(ctx context.Context) {
-
-	log.Debugf("Starting subscription envelope handling loop for topic: %s", s.entity.Topic.String())
-	log.Debugf("Reading envelopes from: %v", s.entity.Envelopes)
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	for {
-		select {
-		case <-ctx.Done():
-			log.Infof("Context for %s closed.", s.entity.Topic.String())
-			return
-		default:
-			envelope, ok := <-s.entity.Envelopes
-			if !ok {
-				log.Infof("subscriptionHandleEnvelopesLoop: Envelopes channel for %s closed.", s.entity.Topic.String())
-				return
-			}
-			log.Debugf("subscriptionHandleEnvelopesLoop: Received envelope: %s", envelope)
-			msg, err := envelope.Open(s.entity.Keyset.EncryptionKey.PrivKey[:])
-			if err != nil {
-				log.Errorf("subscriptionHandleEnvelopesLoop: Error opening envelope: %s", err)
-				continue
-			}
-
-			if msg.Verify() != nil {
-				log.Errorf("subscriptionHandleEnvelopesLoop: Message not verified: %v", msg)
-				continue
-			}
-
-			log.Debugf("subscriptionHandleEnvelopesLoop: open envelope and found: %v", msg)
-			s.entity.Messages <- msg
-		}
-	}
-}
-
-func (s *Subscription) handleMessagesLoop(ctx context.Context) {
-
-	log.Debugf("Starting subscription message handling loop for topic: %s", s.entity.Topic.String())
-	log.Debugf("Reading messages from: %v", s.entity.Messages)
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	for {
-		select {
-		case <-ctx.Done():
-			log.Infof("Context for %s closed.", s.entity.Topic.String())
-			return
-		default:
-			message, ok := <-s.entity.Messages
-			if !ok {
-				log.Infof("Messages channel for %s closed.", s.entity.Topic.String())
-				return
-			}
-
-			log.Debugf("subscriptionHandleMessagesLoop: received message: %v", message)
-
-			// Marshal the message and send it to the owner
-			msgJson, err := json.Marshal(message)
-			if err != nil {
-				log.Errorf("Error marshaling message: %s", err)
-				continue
-			}
-
-			// Send message as JSON to owner
-			s.deliverMessage(msgJson)
-		}
-	}
 }
 
 func (s *Subscription) subscribe() {

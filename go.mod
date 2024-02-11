@@ -6,7 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/bahner/go-ma v0.4.2
-	github.com/bahner/go-ma-actor v0.0.10
+	github.com/bahner/go-ma-actor v0.0.11-0.20240211194043-d57b04333530
 	github.com/ergo-services/ergo v1.999.224
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5

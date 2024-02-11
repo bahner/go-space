@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/bahner/go-ma-actor/entity"
 	"github.com/bahner/go-ma/did/doc"
@@ -38,20 +37,15 @@ func getOrCreateEntity(id string) (*entity.Entity, error) {
 		return nil, err
 	}
 
-	// // We need to publish the identity to the network, before we can create the entity
-	// err = publishIdentityFromKeyset(k)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed to publish identity: %w", err)
-	// }
+	log.Debugf("getOrCreateEntity: publishing identity for: %s", id)
+	// We need to publish the identity to the network, before we can create the entity
+	err = publishIdentityFromKeyset(k)
+	if err != nil {
+		return nil, fmt.Errorf("failed to publish identity: %w", err)
+	}
 
-	log.Debugf("Publishing identity for entity in the background: %s", id)
-	go publishIdentityFromKeyset(k)
-
-	// I know this smells, but we just need to publish  for us to be happy.
-	// We needn't wait until the rest of the world knows, to be able to send messages to the entity
-	time.Sleep(3 * time.Second)
-
-	e, err := entity.NewFromKeyset(k, id)
+	log.Debugf("getOrCreateEntity: creating new entity for: %s", id)
+	e, err := entity.NewFromKeyset(k, id, false) // We'll cache the entity so fetch the newest
 	if err != nil {
 		return nil, err
 	}
@@ -84,11 +78,13 @@ func publishIdentityFromKeyset(k *set.Keyset) error {
 
 	o := doc.DefaultPublishOptions()
 	o.Force = true
+	log.Debugf("config.publishIdentity: publishing DOC: %s with options %v", d.ID, o)
 	_, err = d.Publish(o)
 	if err != nil {
 		return fmt.Errorf("config.publishIdentity: failed to publish DOC: %v", err)
 
 	}
+
 	log.Debugf("config.publishIdentity: published DOC: %s", d.ID)
 
 	return nil
