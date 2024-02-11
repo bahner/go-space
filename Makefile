@@ -2,6 +2,7 @@
 
 NAME = go-space
 MODULE_NAME = github.com/bahner/go-space
+VAULT_TOKEN ?= space
 
 GO ?= go
 PREFIX ?= /usr/local
@@ -53,6 +54,7 @@ up:
 	docker-compose up -d --remove-orphans
 
 vault:
-	docker-compose up -d vault
+	# docker-compose up -d vault
+	vault server --dev -dev-root-token-id=$(VAULT_TOKEN) &
 
 .PHONY: default init tidy build client serve install clean distclean

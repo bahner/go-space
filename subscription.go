@@ -68,7 +68,7 @@ func New(id string) gen.ServerBehavior {
 
 	entity, err := getOrCreateEntity(id)
 	if err != nil {
-		log.Errorf("Error creating entity: %v", err)
+		log.Errorf("Error getting or creating entity: %s", err)
 		return nil
 	}
 
