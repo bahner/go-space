@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/bahner/go-ma-actor/entity"
 	"github.com/bahner/go-ma/did/doc"
@@ -37,11 +38,18 @@ func getOrCreateEntity(id string) (*entity.Entity, error) {
 		return nil, err
 	}
 
-	// We need to publish the identity to the network, before we can create the entity
-	err = publishIdentityFromKeyset(k)
-	if err != nil {
-		return nil, fmt.Errorf("failed to publish identity: %w", err)
-	}
+	// // We need to publish the identity to the network, before we can create the entity
+	// err = publishIdentityFromKeyset(k)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to publish identity: %w", err)
+	// }
+
+	log.Debugf("Publishing identity for entity in the background: %s", id)
+	go publishIdentityFromKeyset(k)
+
+	// I know this smells, but we just need to publish  for us to be happy.
+	// We needn't wait until the rest of the world knows, to be able to send messages to the entity
+	time.Sleep(3 * time.Second)
 
 	e, err := entity.NewFromKeyset(k, id)
 	if err != nil {

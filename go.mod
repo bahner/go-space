@@ -1,12 +1,13 @@
 module go-space
 
-go 1.21.6
+go 1.22
+
+toolchain go1.22.0
 
 require (
 	github.com/bahner/go-ma v0.4.2
-	github.com/bahner/go-ma-actor v0.0.9
+	github.com/bahner/go-ma-actor v0.0.10
 	github.com/ergo-services/ergo v1.999.224
-	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2
@@ -29,6 +30,7 @@ require (
 	github.com/flynn/noise v1.0.0 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.5.0 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect

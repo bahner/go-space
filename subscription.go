@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
+	"sync"
 
 	"github.com/bahner/go-ma-actor/entity"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/msg"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
-	"github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -20,6 +19,10 @@ import (
 const (
 	MESSAGE_CHANNEL_SIZE  = 100
 	ENVELOPE_CHANNEL_SIZE = 100
+)
+
+var (
+	subscriptionsCache = sync.Map{}
 )
 
 type Subscription struct {
@@ -57,6 +60,11 @@ func (s *Subscription) IsValid() bool {
 
 func New(id string) gen.ServerBehavior {
 
+	if s, ok := subscriptionsCache.Load(id); ok {
+		log.Debugf("Found existing genServer: %s", id)
+		return s.(gen.ServerBehavior)
+	}
+
 	log.Debugf("Creating new genServer: %s", id)
 
 	entity, err := getOrCreateEntity(id)
@@ -72,22 +80,34 @@ func New(id string) gen.ServerBehavior {
 	owner := createOwnerProcessId(did.GetFragment(id))
 	log.Debugf("Created owner process id: %s", owner)
 
-	return &Subscription{
+	s := &Subscription{
 		owner:     owner,
 		entity:    entity,
 		messages:  make(chan *msg.Message, MESSAGE_CHANNEL_SIZE),
 		envelopes: make(chan *msg.Envelope, ENVELOPE_CHANNEL_SIZE),
 	}
+
+	subscriptionsCache.Store(id, s)
+
+	return s
 }
 
 func (s *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
 	s.sp = sp // Save the server process, so we can send messages from it
 
-	log.Infof("Subscription init subscribing to topic: %s", s.entity.DID.String())
-	go s.subscriptionLoop() // <-- Error is here. Subscription is not working.
+	ctx := context.Background()
 
-	sp.Process.Send(s.owner, etf.Atom(":go_space_topic_created"))
+	log.Infof("Subscription init subscribing to topic: %s", s.entity.DID.String())
+
+	log.Debugf("Subscription entity: %v", s.entity)
+	go s.entity.Subscribe(ctx, s.entity)
+	go s.subscribe()
+
+	sp.Process.Send(s.owner, etf.Tuple{
+		etf.Atom(":go_space_topic_subscription_created"),
+		etf.String(s.entity.Topic.String()),
+	})
 
 	return nil
 }
@@ -111,7 +131,7 @@ func (s *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Ser
 
 	case "publish":
 		log.Debugf("Received publish message: %s", data)
-		s.entity.Topic.Publish(context.Background(), data[0].([]byte))
+		s.entity.Topic.Publish(s.entity.Ctx, data[0].([]byte))
 		return etf.Atom("ok"), gen.ServerStatusOK
 
 	case "list_peers":
@@ -134,98 +154,6 @@ func (s *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Ser
 func (s *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) gen.ServerStatus {
 	log.Debugf("Received message: %s", message)
 	return gen.ServerStatusOK
-}
-
-func (s *Subscription) subscriptionLoop() {
-
-	sub, err := s.entity.Subscribe()
-	if err != nil {
-		log.Errorf("Error subscribing to topic: %s", err)
-		return
-	}
-	defer sub.Cancel()
-
-	// Start a debug loop if log level is debug
-	if log.GetLevel() == log.DebugLevel {
-		go s.debugLoop()
-	}
-
-	// Start the message and envelope handling loops
-	// which listen on the channels for messages and envelopes
-	go s.handleEnvelopesLoop()
-	go s.handleMessagesLoop()
-
-	var t = s.entity.Topic.String()
-
-	log.Infof("Starting to listen for messages on topic: %s", t)
-
-	for {
-		log.Debugf("Waiting for next message in topic: %s", t)
-		pubsubMessage, ok := <-sub.Messages
-		if !ok {
-			log.Infof("Subscription: %s closed.", t)
-			return
-		}
-
-		if s.handleMessage(pubsubMessage.Data) == nil {
-			log.Debugf("Message: %s handled.", pubsubMessage.Data)
-			continue
-		}
-
-		if s.handleEnvelope(pubsubMessage.Data) == nil {
-			log.Debugf("Envelope: %s handled.", pubsubMessage.Data)
-			continue
-		}
-
-		log.Errorf("Error handling message: %s", pubsubMessage.Data)
-
-	}
-}
-
-func (s *Subscription) handleMessage(data []byte) error {
-
-	msg := new(msg.Message)
-	err := cbor.Unmarshal(data, msg)
-	if err != nil {
-		return fmt.Errorf("error unmarshaling message: %v", err)
-	}
-
-	// If the message is verified, we pass it on and continue prosessing new messages
-	if msg.Verify() != nil {
-		return fmt.Errorf("message not verified: %v", msg)
-	}
-
-	// Message is verified, we pass it on
-	s.messages <- msg
-
-	return nil
-}
-
-func (s *Subscription) handleEnvelope(data []byte) error {
-
-	envelope := new(msg.Envelope)
-	err := cbor.Unmarshal(data, envelope)
-	if err != nil {
-		return fmt.Errorf("error unmarshaling envelope: %v", err)
-	}
-
-	// Sanity check the envelope
-	if envelope.EncryptedContent == nil {
-		return fmt.Errorf("envelope not verified: %v", envelope)
-	}
-
-	if envelope.EncryptedHeaders == nil {
-		return fmt.Errorf("envelope not verified: %v", envelope)
-	}
-
-	if envelope.EphemeralKey == nil {
-		return fmt.Errorf("envelope not verified: %v", envelope)
-	}
-
-	// Seems OK, we pass it on
-	s.envelopes <- envelope
-
-	return nil
 }
 
 func (s *Subscription) deliverMessage(data []byte) error {
@@ -273,69 +201,94 @@ func extractActionData(term etf.Term) (etf.Atom, []etf.Term, error) {
 func (s *Subscription) Terminate(sp *gen.ServerProcess, reason string) {
 
 	// Close the topic.
-	s.entity.Subscription.Cancel()
-	s.entity.Topic.Close()
+	s.entity.Cancel()
 
 	sp.Kill()
 
 	log.Debugf("Terminating subscription: %s", reason)
 }
 
-func (s *Subscription) debugLoop() {
+func (s *Subscription) handleEnvelopesLoop(ctx context.Context) {
+
+	log.Debugf("Starting subscription envelope handling loop for topic: %s", s.entity.Topic.String())
+	log.Debugf("Reading envelopes from: %v", s.entity.Envelopes)
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	for {
-
-		if s.entity.Subscription == nil {
-			log.Debugf("Subscription: %s is nil.", s.entity.Topic.String())
+		select {
+		case <-ctx.Done():
+			log.Infof("Context for %s closed.", s.entity.Topic.String())
 			return
-		} else {
-			log.Debugf("Subscription: %s is alive with peers: %v", s.entity.Topic.String(), s.entity.Topic.ListPeers())
+		default:
+			envelope, ok := <-s.entity.Envelopes
+			if !ok {
+				log.Infof("subscriptionHandleEnvelopesLoop: Envelopes channel for %s closed.", s.entity.Topic.String())
+				return
+			}
+			log.Debugf("subscriptionHandleEnvelopesLoop: Received envelope: %s", envelope)
+			msg, err := envelope.Open(s.entity.Keyset.EncryptionKey.PrivKey[:])
+			if err != nil {
+				log.Errorf("subscriptionHandleEnvelopesLoop: Error opening envelope: %s", err)
+				continue
+			}
+
+			if msg.Verify() != nil {
+				log.Errorf("subscriptionHandleEnvelopesLoop: Message not verified: %v", msg)
+				continue
+			}
+
+			log.Debugf("subscriptionHandleEnvelopesLoop: open envelope and found: %v", msg)
+			s.entity.Messages <- msg
 		}
-		time.Sleep(viper.GetDuration("node.debug_interval"))
 	}
 }
 
-func (s *Subscription) handleEnvelopesLoop() {
+func (s *Subscription) handleMessagesLoop(ctx context.Context) {
+
+	log.Debugf("Starting subscription message handling loop for topic: %s", s.entity.Topic.String())
+	log.Debugf("Reading messages from: %v", s.entity.Messages)
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	for {
-		envelope, ok := <-s.envelopes
-		if !ok {
-			log.Infof("Envelopes channel for %s closed.", s.entity.Topic.String())
+		select {
+		case <-ctx.Done():
+			log.Infof("Context for %s closed.", s.entity.Topic.String())
 			return
-		}
-		log.Debugf("Received envelope: %s", envelope)
-		msg, err := envelope.Open(s.entity.Keyset.EncryptionKey.PrivKey[:])
-		if err != nil {
-			log.Errorf("Error opening envelope: %s", err)
-			continue
-		}
+		default:
+			message, ok := <-s.entity.Messages
+			if !ok {
+				log.Infof("Messages channel for %s closed.", s.entity.Topic.String())
+				return
+			}
 
-		if msg.Verify() != nil {
-			log.Errorf("Message not verified: %v", msg)
-			continue
-		}
+			log.Debugf("subscriptionHandleMessagesLoop: received message: %v", message)
 
-		s.messages <- msg
+			// Marshal the message and send it to the owner
+			msgJson, err := json.Marshal(message)
+			if err != nil {
+				log.Errorf("Error marshaling message: %s", err)
+				continue
+			}
+
+			// Send message as JSON to owner
+			s.deliverMessage(msgJson)
+		}
 	}
 }
 
-func (s *Subscription) handleMessagesLoop() {
+func (s *Subscription) subscribe() {
+	log.Debugf("Starting subscription loop: %s", s.entity.Topic.String())
 
-	for {
-		message, ok := <-s.messages
-		if !ok {
-			log.Infof("Messages channel for %s closed.", s.entity.Topic.String())
-			return
-		}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-		// Marshal the message and send it to the owner
-		msgJson, err := json.Marshal(message)
-		if err != nil {
-			log.Errorf("Error marshaling message: %s", err)
-			continue
-		}
+	go s.handleMessagesLoop(ctx)
+	go s.handleEnvelopesLoop(ctx)
 
-		// Send message as JSON to owner
-		s.deliverMessage(msgJson)
-	}
+	<-ctx.Done()
+	log.Infof("Context for %s closed.", s.entity.Topic.String())
 }

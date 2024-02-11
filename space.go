@@ -58,12 +58,15 @@ func (gr *SPACE) HandleInfo(serverProcess *gen.ServerProcess, message etf.Term) 
 
 func subscribeTopic(topicID string) {
 
+	log.Debugf("Spawning subscription process: %s", topicID)
+
 	n = getNode()
 	log.Debugf("Node name: %s is alive. %t", n.Name(), n.IsAlive())
 
 	log.Debugf("Subscribing to topic: %s", topicID)
 
 	sub := New(topicID)
+
 	log.Debugf("Subscription: %s", sub)
 
 	process, err := n.Spawn(topicID, gen.ProcessOptions{}, sub, topicID)
@@ -76,6 +79,7 @@ func subscribeTopic(topicID string) {
 		}
 		return
 	}
+	log.Debugf("Registering process: %s with name: %s", process.Self(), topicID)
 	n.RegisterName(topicID, process.Self())
 }
 
