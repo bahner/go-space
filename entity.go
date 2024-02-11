@@ -37,14 +37,16 @@ func getOrCreateEntity(id string) (*entity.Entity, error) {
 		return nil, err
 	}
 
+	// We need to publish the identity to the network, before we can create the entity
+	err = publishIdentityFromKeyset(k)
+	if err != nil {
+		return nil, fmt.Errorf("failed to publish identity: %w", err)
+	}
+
 	e, err := entity.NewFromKeyset(k, id)
 	if err != nil {
 		return nil, err
 	}
-
-	// This can take some time. It should be done in the background.
-	// Maybe with a timeout?
-	go publishIdentityFromKeyset(k)
 
 	entities.Set(id, e)
 

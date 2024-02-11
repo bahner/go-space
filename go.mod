@@ -3,8 +3,8 @@ module go-space
 go 1.21.6
 
 require (
-	github.com/bahner/go-ma v0.4.0
-	github.com/bahner/go-ma-actor v0.0.7-0.20240206001924-85fba2a776af
+	github.com/bahner/go-ma v0.4.2
+	github.com/bahner/go-ma-actor v0.0.9
 	github.com/ergo-services/ergo v1.999.224
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/sirupsen/logrus v1.9.3
@@ -162,6 +162,7 @@ require (
 	gonum.org/v1/gonum v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 )

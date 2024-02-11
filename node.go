@@ -40,13 +40,13 @@ func StartApplication(_p2p *p2p.P2P) {
 	// Starting node
 	n, err = ergo.StartNodeWithContext(ctx, nodeName, nodeCookie, options)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to start node: %s", err)
 	}
 
 	// Starting applications
 	process, err = n.Spawn("space", gen.ProcessOptions{}, new(SPACE))
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to spawn space application: %s", err)
 	}
 
 	log.Infof("Started process %q with PID %s.", process.Name(), process.Self())
