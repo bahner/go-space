@@ -3,6 +3,7 @@
 NAME = go-space
 MODULE_NAME = github.com/bahner/go-space
 VAULT_TOKEN ?= space
+NODE = $(NAME)-node
 
 GO ?= go
 PREFIX ?= /usr/local
@@ -22,11 +23,13 @@ go.mod:
 tidy: go.mod
 	$(GO) mod tidy
 
-$(NAME): tidy
-	$(GO) build -o $(NAME)
+node: $(NODE)
+
+$(NODE): tidy
+	$(GO) build -o $(NODE) ./cmd/node
 
 clean:
-	rm -f $(NAME)
+	rm -f $(NAME) $(NODE)
 
 console:
 	docker-compose up -d

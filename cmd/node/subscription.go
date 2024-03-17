@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bahner/go-ma-actor/entity"
-	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma-actor/entity/actor"
 	"github.com/bahner/go-ma/msg"
 	"github.com/ergo-services/ergo/etf"
 	"github.com/ergo-services/ergo/gen"
@@ -26,9 +25,9 @@ var (
 
 type Subscription struct {
 	gen.Server
-	sp     *gen.ServerProcess
-	owner  gen.ProcessID
-	entity *entity.Entity
+	sp    *gen.ServerProcess
+	owner gen.ProcessID
+	actor *actor.Actor
 
 	messages  chan *msg.Message
 	envelopes chan *msg.Envelope
@@ -41,7 +40,7 @@ func (s *Subscription) Verify() error {
 	if s.owner.Name == "" {
 		return fmt.Errorf("owner name is empty")
 	}
-	if s.entity == nil {
+	if s.actor == nil {
 		return fmt.Errorf("entity is nil")
 	}
 	if s.messages == nil {
@@ -66,22 +65,22 @@ func New(id string) gen.ServerBehavior {
 
 	log.Debugf("Creating new genServer: %s", id)
 
-	entity, err := getOrCreateEntity(id)
+	a, err := getOrCreateEntity(id)
 	if err != nil {
 		log.Errorf("Error getting or creating entity: %s", err)
 		return nil
 	}
 
-	log.Debugf("Created topic: %s", entity.Topic.String())
+	log.Debugf("Created topic: %s", a.Entity.Topic.String())
 
 	// The owner is identified by the fragment of the DID
 	// It's the local name ad ID of the owner of the entity
-	owner := createOwnerProcessId(did.GetFragment(id))
+	owner := createOwnerProcessId(a.Entity.DID.Fragment)
 	log.Debugf("Created owner process id: %s", owner)
 
 	s := &Subscription{
 		owner:     owner,
-		entity:    entity,
+		actor:     a,
 		messages:  make(chan *msg.Message, MESSAGE_CHANNEL_SIZE),
 		envelopes: make(chan *msg.Envelope, ENVELOPE_CHANNEL_SIZE),
 	}
@@ -97,15 +96,15 @@ func (s *Subscription) Init(sp *gen.ServerProcess, args ...etf.Term) error {
 
 	ctx := context.Background()
 
-	log.Infof("Subscription init subscribing to topic: %s", s.entity.DID.String())
+	log.Infof("Subscription init subscribing to topic: %s", s.actor.Entity.DID.Id)
 
-	log.Debugf("Subscription entity: %v", s.entity)
-	go s.entity.Subscribe(ctx, s.entity)
+	log.Debugf("Subscription entity: %v", s.actor)
+	go s.actor.Subscribe(ctx, s.actor.Entity)
 	go s.subscribe()
 
 	sp.Process.Send(s.owner, etf.Tuple{
 		etf.Atom(":go_space_topic_subscription_created"),
-		etf.String(s.entity.Topic.String()),
+		etf.String(s.actor.Entity.Topic.String()),
 	})
 
 	return nil
@@ -117,6 +116,9 @@ func (s *Subscription) HandleCast(server_procces *gen.ServerProcess, message etf
 }
 
 func (s *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.ServerFrom, message etf.Term) (etf.Term, gen.ServerStatus) {
+
+	t := s.actor.Entity.Topic
+	ctx := s.actor.Entity.Ctx
 
 	log.Debugf("Received message: %s from: %v", message, from)
 
@@ -130,12 +132,12 @@ func (s *Subscription) HandleCall(serverProcess *gen.ServerProcess, from gen.Ser
 
 	case "publish":
 		log.Debugf("Received publish message: %s", data)
-		s.entity.Topic.Publish(s.entity.Ctx, data[0].([]byte))
+		t.Publish(ctx, data[0].([]byte))
 		return etf.Atom("ok"), gen.ServerStatusOK
 
 	case "list_peers":
 		log.Debug("Received list_peers message.")
-		result := s.entity.Topic.ListPeers()
+		result := t.ListPeers()
 		return result, gen.ServerStatusOK
 
 	case "get_topics":
@@ -158,19 +160,18 @@ func (s *Subscription) HandleInfo(serverProcess *gen.ServerProcess, message etf.
 func (s *Subscription) Terminate(sp *gen.ServerProcess, reason string) {
 
 	// Close the topic.
-	s.entity.Cancel()
+	s.actor.Entity.Cancel()
 
 	sp.Kill()
 
 	log.Debugf("Terminating subscription: %s", reason)
 }
 
+// Takes the DID Fragment as argument, not the DID
 func createOwnerProcessId(id string) gen.ProcessID {
 
-	fragment := did.GetFragment(id)
-
 	return gen.ProcessID{
-		Name: fragment,
+		Name: id,
 		Node: viper.GetString("node.space"),
 	}
 }
@@ -197,7 +198,10 @@ func extractActionData(term etf.Term) (etf.Atom, []etf.Term, error) {
 }
 
 func (s *Subscription) subscribe() {
-	log.Debugf("Starting subscription loop: %s", s.entity.Topic.String())
+
+	t := s.actor.Entity.Topic.String()
+
+	log.Debugf("Starting subscription loop: %s", t)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -206,5 +210,5 @@ func (s *Subscription) subscribe() {
 	go s.handleEnvelopesLoop(ctx)
 
 	<-ctx.Done()
-	log.Infof("Context for %s closed.", s.entity.Topic.String())
+	log.Infof("Context for %s closed.", t)
 }

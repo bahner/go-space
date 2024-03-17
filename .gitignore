@@ -23,3 +23,5 @@ go.work
 # Binaries created by go build ., ie the module name.
 go-space
 .*.log
+go-space-node
+launch.json

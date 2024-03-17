@@ -57,7 +57,7 @@ func VaultClient() (*api.Client, error) {
 }
 
 // Store the keyset the id is the fragment, the nick, not the full did
-func storeKeyset(keyset *set.Keyset) error {
+func storeKeyset(keyset set.Keyset) error {
 
 	log.Debugf("Storing keyset: %s", keyset.DID.Fragment)
 	id := keyset.DID.Fragment
@@ -92,11 +92,11 @@ func storeKeysetString(id string, keyset string) error {
 	log.Infof("Stored keyset: %s", id)
 	return nil
 }
-func retrieveKeyset(id string) (*set.Keyset, error) {
+func retrieveKeyset(id string) (set.Keyset, error) {
 
 	keysetString, err := retrieveKeysetString(id)
 	if err != nil {
-		return nil, err
+		return set.Keyset{}, err
 	}
 
 	return set.Unpack(keysetString)
@@ -122,22 +122,22 @@ func retrieveKeysetString(id string) (string, error) {
 	return keyset, nil
 }
 
-func getOrCreateKeysetFromVault(id string) (*set.Keyset, error) {
+func getOrCreateKeysetFromVault(id string) (set.Keyset, error) {
 
 	keyset, err := retrieveKeyset(id)
 	if err != nil {
 		if err != api.ErrSecretNotFound {
-			return nil, fmt.Errorf("error retrieving keyset: %s", err)
+			return set.Keyset{}, fmt.Errorf("error retrieving keyset: %s", err)
 		}
 
 		keyset, err = set.GetOrCreate(id)
 		if err != nil {
-			return nil, fmt.Errorf("error getting or creating keyset: %s", err)
+			return set.Keyset{}, fmt.Errorf("error getting or creating keyset: %s", err)
 		}
 
 		err = storeKeyset(keyset)
 		if err != nil {
-			return nil, fmt.Errorf("error storing keyset: %s", err)
+			return set.Keyset{}, fmt.Errorf("error storing keyset: %s", err)
 		}
 	}
 

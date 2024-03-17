@@ -5,7 +5,7 @@
 services:
   go-space:
     image: ${IMAGE}
-    hostname: go-space
+    hostname: go-space-node
     env_file: .env
 #    ports:
 #      - "127.0.0.1:${SPACE_NODE_PORT}:${SPACE_NODE_PORT}"

@@ -10,8 +10,11 @@ import (
 
 func (s *Subscription) handleMessagesLoop(ctx context.Context) {
 
-	log.Debugf("Starting subscription message handling loop for topic: %s", s.entity.Topic.String())
-	log.Debugf("Reading messages from: %v", s.entity.Messages)
+	t := s.actor.Entity.Topic.String()
+	messages := s.actor.Entity.Messages
+
+	log.Debugf("Starting subscription message handling loop for topic: %s", t)
+	log.Debugf("Reading messages from: %v", messages)
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -19,12 +22,12 @@ func (s *Subscription) handleMessagesLoop(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Infof("Context for %s closed.", s.entity.Topic.String())
+			log.Infof("Context for %s closed.", t)
 			return
 		default:
-			message, ok := <-s.entity.Messages
+			message, ok := <-messages
 			if !ok {
-				log.Infof("Messages channel for %s closed.", s.entity.Topic.String())
+				log.Infof("Messages channel for %s closed.", t)
 				return
 			}
 
